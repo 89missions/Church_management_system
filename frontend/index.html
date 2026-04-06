@@ -1,61 +1,131 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Church Management System</title>
-
-<link rel="stylesheet" href="./Css/index.
-css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#4F46E5">
+    <meta name="description" content="Winners Chapel Church Management System - Manage members, attendance, offerings and more">
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="https://images.unsplash.com/photo-1438032945730-e1b637b2fc1f?w=180&h=180&fit=crop">
+    <title>Winners Chapel | Church Management System</title>
+    <link rel="stylesheet" href="css/style.css">
 </head>
-
 <body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="logo">
+                <span class="logo-icon">⛪</span>
+                <span class="logo-text">Winners Chapel</span>
+            </div>
+            <div class="nav-buttons">
+                <a href="signin.html" class="nav-btn signin-btn">Sign In</a>
+                <a href="signup.html" class="nav-btn signup-btn">Sign Up</a>
+            </div>
+        </div>
+        
+    </nav>
 
-<header>
-    <h1>Church Management System</h1>
-    <p>Welcome to the Church Administration Dashboard</p>
-</header>
+    
 
-<nav>
-    <ul>
-        <li><a href="#">Dashboard</a></li>
-        <li><a href="#">Members</a></li>
-        <li><a href="#">Events</a></li>
-        <li><a href="#">Donations</a></li>
-        <li><a href="#">Attendance</a></li>
-        <li><a href="#">Reports</a></li>
-    </ul>
-</nav>
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-overlay"></div>
+        <div class="hero-content">
+            <h1 class="hero-title">Winners Chapel</h1>
+            <p class="hero-subtitle">A Place of Worship, Victory & Community</p>
+            <p class="hero-description">Join us as we worship, grow in faith, and make a difference together.</p>
+            <div class="hero-buttons">
+                <a href="signup.html" class="btn btn-primary">Join Our Family</a>
+                <a href="#about" class="btn btn-outline">Learn More</a>
+            </div>
+        </div>
+    </section>
 
-<section class="dashboard">
+    <!-- About Section -->
+    <section id="about" class="about-section">
+        <div class="container">
+            <h2 class="section-title">About Winners Chapel</h2>
+            <div class="about-grid">
+                <div class="about-card">
+                    <div class="card-icon">🙏</div>
+                    <h3>Our Mission</h3>
+                    <p>To win souls for Christ and nurture believers into spiritual maturity through sound doctrine and fellowship.</p>
+                </div>
+                <div class="about-card">
+                    <div class="card-icon">❤️</div>
+                    <h3>Our Vision</h3>
+                    <p>Raising victorious Christians who impact their world for the Kingdom of God.</p>
+                </div>
+                <div class="about-card">
+                    <div class="card-icon">👥</div>
+                    <h3>Our Community</h3>
+                    <p>A loving family where every member is valued, equipped, and empowered to fulfill their purpose.</p>
+                </div>
+            </div>
+        </div>
+    </section>
 
-    <div class="card">
-        <h3>Total Members</h3>
-        <p id="members">0</p>
-    </div>
+    <!-- Worship Image Section -->
+    <section class="worship-section">
+        <div class="container">
+            <h2 class="section-title">Worship With Us</h2>
+            <div class="image-gallery">
+                <div class="gallery-item">
+                    <img src="https://images.unsplash.com/photo-1438032945730-e1b637b2fc1f?w=400&h=300&fit=crop" alt="Church worship service">
+                    <div class="gallery-caption">Sunday Service</div>
+                </div>
+                <div class="gallery-item">
+                    <img src="https://images.unsplash.com/photo-1505238680356-667803448bb6?w=400&h=300&fit=crop" alt="People worshiping with hands raised">
+                    <div class="gallery-caption">Praise & Worship</div>
+                </div>
+                <div class="gallery-item">
+                    <img src="https://images.unsplash.com/photo-1529078155058-5d716f45d604?w=400&h=300&fit=crop" alt="Church congregation">
+                    <div class="gallery-caption">Fellowship</div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-    <div class="card">
-        <h3>Upcoming Events</h3>
-        <p id="events">0</p>
-    </div>
+    <!-- Service Times Section -->
+    <section class="services-section">
+        <div class="container">
+            <h2 class="section-title">Service Times</h2>
+            <div class="services-grid">
+                <div class="service-card">
+                    <div class="service-day">Sunday</div>
+                    <div class="service-time">9:00 AM - Worship Service</div>
+                    <div class="service-time">11:00 AM - Second Service</div>
+                </div>
+                <div class="service-card">
+                    <div class="service-day">Wednesday</div>
+                    <div class="service-time">6:00 PM - Bible Study</div>
+                </div>
+                <div class="service-card">
+                    <div class="service-day">Friday</div>
+                    <div class="service-time">6:00 PM - Prayer Service</div>
+                </div>
+            </div>
+        </div>
+    </section>
 
-    <div class="card">
-        <h3>Total Donations</h3>
-        <p id="donations">$0</p>
-    </div>
+    <!-- Call to Action -->
+    <section class="cta-section">
+        <div class="container">
+            <h2>Ready to Join Our Church Family?</h2>
+            <p>Sign up today and become part of Winners Chapel community.</p>
+            <a href="signup.html" class="btn btn-large">Get Started</a>
+        </div>
+    </section>
 
-    <div class="card">
-        <h3>Attendance Today</h3>
-        <p id="attendance">0</p>
-    </div>
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 Winners Chapel. All rights reserved.</p>
+            <p>Church Management System</p>
+        </div>
+    </footer>
 
-</section>
-
-<footer>
-<p>© 2026 Church Management System</p>
-</footer>
-
-<script src="index.js"></script>
-
+    <script src="js/app.js"></script>
 </body>
 </html>
