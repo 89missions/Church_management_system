@@ -9,7 +9,8 @@ app.use(cors({
     Origin: '*'
 }))
 
-app.use('/api/auth/login',require('./routes/api/authroute.js'))
+app.use('/api/auth/',require('./routes/api/authroute.js'))
+app.use('/api/members/',require('./routes/api/membersroute.js'))
 
 app.listen(PORT, ()=>{
     console.log(`Server running on port ${PORT}`)

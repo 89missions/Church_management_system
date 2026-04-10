@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#4F46E5">
+    <title>Record Offerings | Winners Chapel CMS</title>
+    <link rel="manifest" href="./manifest.json">
+    <link rel="stylesheet" href="./css/style.css">
+    <style>
+        .offerings-container {
+            max-width: 1400px;
+            margin: 80px auto 2rem;
+            padding: 0 2rem;
+        }
+
+        .header-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .record-btn {
+            background: var(--primary);
+            color: white;
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        .two-columns {
+            display: grid;
+            grid-template-columns: 1fr 1.5fr;
+            gap: 2rem;
+        }
+
+        .form-card, .list-card, .summary-card {
+            background: white;
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+        }
+
+        .submit-btn {
+            background: var(--primary);
+            color: white;
+            width: 100%;
+            padding: 0.8rem;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-top: 0.5rem;
+        }
+
+        .member-search {
+            position: relative;
+        }
+
+        .search-results {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 10;
+            display: none;
+        }
+
+        .search-result-item {
+            padding: 0.75rem;
+            cursor: pointer;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .search-result-item:hover {
+            background: #f9fafb;
+        }
+
+        .selected-member {
+            background: #f0fdf4;
+            padding: 0.75rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .offerings-table {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 0.75rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        th {
+            background: #f9fafb;
+            font-weight: 600;
+        }
+
+        .summary-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-box {
+            text-align: center;
+            padding: 1rem;
+            background: #f9fafb;
+            border-radius: 10px;
+        }
+
+        .stat-number {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .filter-bar {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-bar input, .filter-bar select {
+            padding: 0.5rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+        }
+
+        .alert-success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .alert-error {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        @media (max-width: 768px) {
+            .offerings-container {
+                padding: 0 1rem;
+            }
+            .two-columns {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="offerings-container">
+        <div class="header-bar">
+            <h1>💰 Record Offerings</h1>
+            <button class="record-btn" onclick="scrollToForm()">+ New Offering</button>
+        </div>
+
+        <div id="alertMessage"></div>
+
+        <div class="two-columns">
+            <!-- Left Column: Record Offering Form -->
+            <div class="form-card" id="offeringForm">
+                <h2 style="margin-bottom: 1.5rem;">Record New Offering</h2>
+                
+                <div class="form-group member-search">
+                    <label>Select Member</label>
+                    <input type="text" id="memberSearch" placeholder="Search by name or phone...">
+                    <div id="searchResults" class="search-results"></div>
+                </div>
+
+                <div id="selectedMemberDisplay" style="display: none;">
+                    <div class="selected-member">
+                        <span id="selectedMemberName"></span>
+                        <button type="button" onclick="clearSelectedMember()" style="background: none; border: none; font-size: 1.2rem; cursor: pointer;">&times;</button>
+                    </div>
+                </div>
+
+                <input type="hidden" id="selectedMemberId">
+
+                <div class="form-group">
+                    <label>Offering Type</label>
+                    <select id="offeringType">
+                        <option value="Tithe">Tithe</option>
+                        <option value="Pledge">Pledge</option>
+                        <option value="Building Fund">Building Fund</option>
+                        <option value="Thanksgiving">Thanksgiving</option>
+                        <option value="Mission">Mission</option>
+                        <option value="Welfare">Welfare</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Amount (₵)</label>
+                    <input type="number" id="amount" step="0.01" placeholder="0.00">
+                </div>
+
+                <div class="form-group">
+                    <label>Payment Method</label>
+                    <select id="paymentMethod">
+                        <option value="Cash">Cash</option>
+                        <option value="Mobile Money">Mobile Money</option>
+                        <option value="Bank Transfer">Bank Transfer</option>
+                        <option value="Check">Check</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>Reference Number (Optional)</label>
+                    <input type="text" id="referenceNumber" placeholder="Transaction/Check number">
+                </div>
+
+                <div class="form-group">
+                    <label>Offering Date</label>
+                    <input type="date" id="offeringDate">
+                </div>
+
+                <div class="form-group">
+                    <label>Notes (Optional)</label>
+                    <textarea id="notes" rows="2" placeholder="Any additional notes..."></textarea>
+                </div>
+
+                <button class="submit-btn" onclick="recordOffering()">Record Offering</button>
+            </div>
+
+            <!-- Right Column: Offerings List -->
+            <div>
+                <div class="summary-card">
+                    <h3>Quick Summary</h3>
+                    <div class="summary-stats">
+                        <div class="stat-box">
+                            <div class="stat-number" id="totalToday">₵0</div>
+                            <div>Today's Total</div>
+                        </div>
+                        <div class="stat-box">
+                            <div class="stat-number" id="totalThisMonth">₵0</div>
+                            <div>This Month</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="list-card" style="margin-top: 1.5rem;">
+                    <h3>Recent Offerings</h3>
+                    <div class="filter-bar">
+                        <input type="text" id="filterSearch" placeholder="Search member...">
+                        <select id="filterType">
+                            <option value="">All Types</option>
+                            <option value="Tithe">Tithe</option>
+                            <option value="Pledge">Pledge</option>
+                            <option value="Building Fund">Building Fund</option>
+                            <option value="Thanksgiving">Thanksgiving</option>
+                            <option value="Mission">Mission</option>
+                            <option value="Welfare">Welfare</option>
+                        </select>
+                    </div>
+                    <div class="offerings-table">
+                        <div id="offeringsList">
+                            <div class="loading">Loading offerings...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="./js/auth.js"></script>
+    <script src="./js/offerings.js"></script>
+</body>
+</html>

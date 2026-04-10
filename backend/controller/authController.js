@@ -69,4 +69,8 @@ const authController = async (req,res)=>{
         return res.status(500).json({message:"Internal Server Error.."})
     }
 }
-module.exports = authController
+
+const loginController = ()=>{
+    //handlelogin code comes here
+}
+module.exports = {authController, loginController}
