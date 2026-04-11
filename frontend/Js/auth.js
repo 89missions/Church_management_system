@@ -36,8 +36,9 @@ document.getElementById('signinForm')?.addEventListener('submit', async (e) => {
                 role 
             })
         });
-     console.log(role)
+        
         const data = await response.json();
+        console.log(data)
         
         if (response.ok && data.success) {
             // Store user data

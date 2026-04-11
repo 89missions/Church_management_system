@@ -5,7 +5,7 @@ const bcrypt = require('bcryptjs')
 const getMembers = async (req,res)=>{
     try {
          //quering the db..
-        const allmembers = await pool.query('SELECT first_name, last_name, email, phone, address FROM members')
+        const allmembers = await pool.query('SELECT id, first_name, last_name, email, phone, address FROM members')
         res.status(200).json(allmembers.rows)
     } catch (error) {
         console.error(error)
@@ -22,7 +22,7 @@ const getMembersWithId= async (req,res)=>{
             return res.status(400).json({"message":"Missing or invalid Id..."})
         }
         //quering the db..
-        const getmemberwithid = await pool.query('SELECT first_name, last_name, email, phone, address FROM members where id = $1',[id])
+        const getmemberwithid = await pool.query('SELECT id, first_name, last_name, email, phone, address FROM members where id = $1',[id])
 
         //if member doesnt exist
         if (getmemberwithid.rows.length === 0) {
@@ -52,10 +52,10 @@ const postMembers = async (req, res) => {
             emergency_contact_phone,
             joined_date,
             status,
-            password,
             positions
         } = req.body;
 
+        const defaultpassword = 'WCO@1234'
         // Validation to ensure backend receives all inputs
         if (!first_name || !last_name || !phone) {
             return res.status(400).json({ 
@@ -64,7 +64,7 @@ const postMembers = async (req, res) => {
         }
 
         //hashing the default password
-        const hashed_password = await bcrypt.hash(password,10)
+        const hashed_password = await bcrypt.hash(defaultpassword,10)
 
         // Querying the database
         const addMember = await pool.query(
@@ -72,7 +72,7 @@ const postMembers = async (req, res) => {
                 first_name, last_name, email, phone, date_of_birth, gender, address,
                 marital_status, occupation, emergency_contact_name, emergency_contact_phone,
                 joined_date, status, password_hash, positions
-            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)`,
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)`,
             [
                 first_name, last_name, email, phone, date_of_birth, gender, address,
                 marital_status, occupation, emergency_contact_name, emergency_contact_phone,
@@ -220,16 +220,15 @@ const updateMembers = async (req, res) => {
     }
 };
 
-//delete members
-const deleteMembers= async (req,res)=>{
+const deleteMembers = async (req, res) => {
     try {
-        const {id} = req.params
-
-        //validate that theres an id in the req.body
-        if(!id){
-            return res.status(500).json({'message':"internal server error..."})
+        const { id } = req.params;  
+        console.log(req.params)
+        
+        if (!id) {
+            return res.status(400).json({ message: "Member ID is required" });
         }
-        //querying the db to delete user based on the id in the req.body
+        
         const result = await pool.query(
             'DELETE FROM members WHERE id = $1 RETURNING id',
             [id]
@@ -240,12 +239,12 @@ const deleteMembers= async (req,res)=>{
         }
         
         return res.status(200).json({ message: "Successfully deleted member" });
-
+        
     } catch (error) {
-        console.error(error)
-       return res.sendStatus(500)
+        console.error(error);
+        return res.status(500).json({ message: "Internal Server Error" });  // Fixed for consistency
     }
-}
+};
 
 module.exports={
     getMembers,

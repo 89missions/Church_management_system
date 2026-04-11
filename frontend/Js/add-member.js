@@ -1,5 +1,3 @@
-const API_BASE_URL = 'http://localhost:3000/api';
-
 document.getElementById('addMemberForm')?.addEventListener('submit', async (e) => {
     e.preventDefault();
     
@@ -18,6 +16,8 @@ document.getElementById('addMemberForm')?.addEventListener('submit', async (e) =
         emergency_contact_phone: document.getElementById('emergencyPhone').value || null,
         positions: getSelectedPositions()
     };
+
+    console.log(memberData)
     
     // Validate required fields
     if (!memberData.first_name || !memberData.last_name || !memberData.phone) {
@@ -39,7 +39,7 @@ document.getElementById('addMemberForm')?.addEventListener('submit', async (e) =
     try {
         const token = localStorage.getItem('token');
         
-        const response = await fetch(`${API_BASE_URL}/members`, {
+        const response = await fetch(`${API_BASE_URL}/members/addmember`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -96,13 +96,14 @@ function getSelectedPositions() {
     return selected;
 }
 
-// Generate default password (backend should do this, but for demo)
+/*
 function generateDefaultPassword(firstName, phone) {
     const churchCode = 'WC';
     const last4 = phone.slice(-4);
     const randomNum = Math.floor(Math.random() * 100);
     return `${churchCode}${last4}${randomNum}`;
 }
+*/
 
 // Copy password to clipboard
 function copyPassword() {

@@ -1,4 +1,3 @@
-const API_BASE_URL = 'http://localhost:3000/api';
 let allMembers = [];
 let offerings = [];
 
@@ -32,7 +31,7 @@ async function loadMembers() {
     const token = localStorage.getItem('token');
     
     try {
-        const response = await fetch(`${API_BASE_URL}/members`, {
+        const response = await fetch(`${API_BASE_URL}/members/`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         
