@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#4F46E5">
+    <title>Edit Member | Winners Chapel CMS</title>
+    <link rel="manifest" href="./manifest.json">
+    <link rel="stylesheet" href="./css/style.css">
+    <style>
+        .form-container {
+            max-width: 900px;
+            margin: 80px auto 2rem;
+            padding: 2rem;
+            background: white;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+        }
+
+        .form-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .form-header h1 {
+            font-size: 1.8rem;
+            color: var(--dark);
+        }
+
+        .back-btn {
+            background: #e5e7eb;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            text-decoration: none;
+            color: var(--dark);
+            display: inline-block;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--dark);
+        }
+
+        .form-group label .required {
+            color: #ef4444;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-family: inherit;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        select[multiple] {
+            min-height: 100px;
+        }
+
+        .submit-btn {
+            background: var(--primary);
+            color: white;
+            width: 100%;
+            padding: 1rem;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 1rem;
+        }
+
+        .submit-btn:hover {
+            background: var(--primary-dark);
+            transform: translateY(-2px);
+        }
+
+        .alert {
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 1.5rem;
+        }
+
+        .alert-success {
+            background: #d1fae5;
+            color: #065f46;
+            border: 1px solid #a7f3d0;
+        }
+
+        .alert-error {
+            background: #fee2e2;
+            color: #dc2626;
+            border: 1px solid #fecaca;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: var(--gray);
+        }
+
+        @media (max-width: 768px) {
+            .form-container {
+                margin: 60px 1rem 1rem;
+                padding: 1.5rem;
+            }
+            .form-row {
+                grid-template-columns: 1fr;
+                gap: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <div class="form-header">
+            <h1>✏️ Edit Member</h1>
+            <a href="members-list.html" class="back-btn">← Back to Members</a>
+        </div>
+
+        <div id="alertMessage"></div>
+        <div id="loadingMessage" class="loading">Loading member data...</div>
+
+        <form id="editMemberForm" style="display: none;">
+            <input type="hidden" id="memberId">
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>First Name <span class="required">*</span></label>
+                    <input type="text" id="firstName" required>
+                </div>
+                <div class="form-group">
+                    <label>Last Name <span class="required">*</span></label>
+                    <input type="text" id="lastName" required>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="email" placeholder="member@church.org">
+                </div>
+                <div class="form-group">
+                    <label>Phone Number <span class="required">*</span></label>
+                    <input type="tel" id="phone" required>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Date of Birth</label>
+                    <input type="date" id="dob">
+                </div>
+                <div class="form-group">
+                    <label>Gender</label>
+                    <select id="gender">
+                        <option value="">Select</option>
+                        <option value="M">Male</option>
+                        <option value="F">Female</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Address</label>
+                <textarea id="address" rows="2"></textarea>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Marital Status</label>
+                    <select id="maritalStatus">
+                        <option value="">Select</option>
+                        <option value="Single">Single</option>
+                        <option value="Married">Married</option>
+                        <option value="Widowed">Widowed</option>
+                        <option value="Divorced">Divorced</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Occupation</label>
+                    <input type="text" id="occupation">
+                </div>
+            </div>
+
+            <h3 style="margin: 1.5rem 0 1rem; color: var(--dark);">Emergency Contact</h3>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Emergency Contact Name</label>
+                    <input type="text" id="emergencyName">
+                </div>
+                <div class="form-group">
+                    <label>Emergency Contact Phone</label>
+                    <input type="tel" id="emergencyPhone">
+                </div>
+            </div>
+
+            <h3 style="margin: 1.5rem 0 1rem; color: var(--dark);">Church Information</h3>
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Status</label>
+                    <select id="status">
+                        <option value="Active">Active</option>
+                        <option value="Inactive">Inactive</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Positions</label>
+                    <select id="positions" multiple size="4">
+                        <option value="member">Regular Member</option>
+                        <option value="usher">Usher</option>
+                        <option value="small_group_leader">Small Group Leader</option>
+                        <option value="worship_leader">Worship Leader</option>
+                        <option value="treasurer">Treasurer</option>
+                        <option value="secretary">Secretary</option>
+                        <option value="pastor">Pastor</option>
+                        <option value="elder">Elder</option>
+                    </select>
+                    <small>Hold Ctrl/Cmd to select multiple positions</small>
+                </div>
+            </div>
+
+            <button type="submit" class="submit-btn">Update Member</button>
+        </form>
+    </div>
+
+    <script src="./js/auth.js"></script>
+    <script src="./js/edit-member.js"></script>
+</body>
+</html>

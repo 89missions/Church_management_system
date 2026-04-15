@@ -16,15 +16,18 @@ function setupDateDefaults() {
 }
 
 function setupEventListeners() {
-    // Member search
     const searchInput = document.getElementById('memberSearch');
     if (searchInput) {
         searchInput.addEventListener('input', handleMemberSearch);
     }
 
-    // Filter listeners
     document.getElementById('filterSearch')?.addEventListener('input', filterOfferings);
     document.getElementById('filterType')?.addEventListener('change', filterOfferings);
+    
+    // Date filter listeners
+    document.getElementById('startDate')?.addEventListener('change', filterByDateRange);
+    document.getElementById('endDate')?.addEventListener('change', filterByDateRange);
+    document.getElementById('clearFilter')?.addEventListener('click', clearDateFilter);
 }
 
 async function loadMembers() {
@@ -60,14 +63,82 @@ async function loadOfferings() {
         if (response.ok) {
             offerings = await response.json();
             displayOfferings(offerings);
-            updateSummary();
         }
+        
+        await loadTodayTotal();
+        await loadMonthlyTotal();
+        
     } catch (error) {
         console.error('Error loading offerings:', error);
         document.getElementById('offeringsList').innerHTML = `
             <div class="empty-state">Failed to load offerings</div>
         `;
     }
+}
+
+async function loadTodayTotal() {
+    const token = localStorage.getItem('token');
+    
+    try {
+        const response = await fetch(`${API_BASE_URL}/offerings/today`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            document.getElementById('totalToday').textContent = `₵${data.total.toFixed(2)}`;
+        }
+    } catch (error) {
+        console.error('Error loading today total:', error);
+    }
+}
+
+async function loadMonthlyTotal() {
+    const token = localStorage.getItem('token');
+    
+    try {
+        const response = await fetch(`${API_BASE_URL}/offerings/monthly`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            document.getElementById('totalThisMonth').textContent = `₵${data.total.toFixed(2)}`;
+        }
+    } catch (error) {
+        console.error('Error loading monthly total:', error);
+    }
+}
+
+async function filterByDateRange() {
+    const startDate = document.getElementById('startDate').value;
+    const endDate = document.getElementById('endDate').value;
+    
+    if (!startDate || !endDate) {
+        return;
+    }
+    
+    const token = localStorage.getItem('token');
+    
+    try {
+        const response = await fetch(`${API_BASE_URL}/offerings/date-range?startDate=${startDate}&endDate=${endDate}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (response.ok) {
+            const filtered = await response.json();
+            displayOfferings(filtered);
+        }
+    } catch (error) {
+        console.error('Error filtering by date:', error);
+        showAlert('Error filtering offerings', 'error');
+    }
+}
+
+function clearDateFilter() {
+    document.getElementById('startDate').value = '';
+    document.getElementById('endDate').value = '';
+    displayOfferings(offerings);
 }
 
 function handleMemberSearch(e) {
@@ -160,7 +231,6 @@ async function recordOffering() {
         if (response.ok) {
             showAlert('Offering recorded successfully!', 'success');
             
-            // Reset form
             clearSelectedMember();
             document.getElementById('offeringType').value = 'Tithe';
             document.getElementById('amount').value = '';
@@ -169,8 +239,7 @@ async function recordOffering() {
             document.getElementById('notes').value = '';
             document.getElementById('offeringDate').value = new Date().toISOString().split('T')[0];
             
-            // Reload offerings
-            loadOfferings();
+            await loadOfferings();
         } else {
             const error = await response.json();
             showAlert(error.message || 'Error recording offering', 'error');
@@ -237,32 +306,6 @@ function filterOfferings() {
     }
     
     displayOfferings(filtered);
-}
-
-function updateSummary() {
-    const today = new Date().toISOString().split('T')[0];
-    const currentMonth = new Date().getMonth();
-    const currentYear = new Date().getFullYear();
-    
-    let todayTotal = 0;
-    let monthTotal = 0;
-    
-    offerings.forEach(offering => {
-        const offeringDate = offering.offering_date;
-        const amount = parseFloat(offering.amount);
-        
-        if (offeringDate === today) {
-            todayTotal += amount;
-        }
-        
-        const date = new Date(offeringDate);
-        if (date.getMonth() === currentMonth && date.getFullYear() === currentYear) {
-            monthTotal += amount;
-        }
-    });
-    
-    document.getElementById('totalToday').textContent = `₵${todayTotal.toFixed(2)}`;
-    document.getElementById('totalThisMonth').textContent = `₵${monthTotal.toFixed(2)}`;
 }
 
 function formatDate(dateString) {

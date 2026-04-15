@@ -206,7 +206,7 @@
                 <h2 style="margin-bottom: 1.5rem;">Record New Offering</h2>
                 
                 <div class="form-group member-search">
-                    <label>Select Member</label>
+                    <label>Select Member(Leave blank if record is for church offetory)</label>
                     <input type="text" id="memberSearch" placeholder="Search by name or phone...">
                     <div id="searchResults" class="search-results"></div>
                 </div>
@@ -295,8 +295,10 @@
                             <option value="Thanksgiving">Thanksgiving</option>
                             <option value="Mission">Mission</option>
                             <option value="Welfare">Welfare</option>
-                            <option value="SundayOffertory">Sunday Offertory</option>
                         </select>
+                        <input type="date" id="startDate" placeholder="Start Date">
+                        <input type="date" id="endDate" placeholder="End Date">
+                        <button id="clearFilter" style="padding: 0.5rem 1rem; background: #e5e7eb; border: none; border-radius: 8px; cursor: pointer;">Clear</button>
                     </div>
                     <div class="offerings-table">
                         <div id="offeringsList">

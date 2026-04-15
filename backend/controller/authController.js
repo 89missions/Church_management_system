@@ -14,7 +14,7 @@ const authController = async (req,res)=>{
            return res.status(401).json({message:"You must be added to the system by the secretary..."});
            }
 
-           // Add this after checking if user exists
+           //check if user is active
             if (user.status !== 'Active') {
              return res.status(403).json({ 
              success: false, 
@@ -23,7 +23,6 @@ const authController = async (req,res)=>{
             }
 
            //validate role..
-           console.log(user.positions)
            const validateRole = user.positions.includes(role)
            if(!validateRole){
             return res.status(403).json({message:"You do not have that role..."})
@@ -49,7 +48,6 @@ const authController = async (req,res)=>{
             {expiresIn: '3d'}
         )
 
-        
         //sending it to the client
         res.status(200).json({
             success: true,
@@ -69,8 +67,4 @@ const authController = async (req,res)=>{
         return res.status(500).json({message:"Internal Server Error.."})
     }
 }
-
-const loginController = ()=>{
-    //handlelogin code comes here
-}
-module.exports = {authController, loginController}
+module.exports = {authController}
