@@ -67,4 +67,8 @@ const authController = async (req,res)=>{
         return res.status(500).json({message:"Internal Server Error.."})
     }
 }
-module.exports = {authController}
+
+const changePassword = async (req,res)=>{
+    
+}
+module.exports = {authController,changePassword}

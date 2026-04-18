@@ -1,4 +1,3 @@
-const API_BASE_URL = 'http://localhost:3000/api';
 let currentEventId = null;
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -34,7 +33,7 @@ async function loadEvents() {
         console.error('Error loading events:', error);
         document.getElementById('eventsList').innerHTML = `
             <div class="empty-state">
-                ❌ Failed to load events. Make sure backend is running.
+                ❌ Failed to load events.
             </div>
         `;
     }
@@ -77,7 +76,6 @@ function displayEvents(events) {
                         👥 ${event.attendee_count || 0} / ${event.max_attendees || '∞'} attending
                     </div>
                     <div class="event-actions">
-                        <button class="view-rsvp" onclick="viewRsvp('${event.id}')">📋 View RSVP</button>
                         <button class="edit-event" onclick="openEventModal('${event.id}')">✏️ Edit</button>
                         <button class="delete-event" onclick="deleteEvent('${event.id}')">🗑️ Delete</button>
                     </div>
@@ -97,7 +95,6 @@ async function openEventModal(id = null) {
         currentEventId = id;
         document.getElementById('modalTitle').textContent = 'Edit Event';
         
-        // Fetch event details
         const token = localStorage.getItem('token');
         try {
             const response = await fetch(`${API_BASE_URL}/events/${id}`, {
@@ -123,7 +120,6 @@ async function openEventModal(id = null) {
         currentEventId = null;
         document.getElementById('modalTitle').textContent = 'Create New Event';
         document.getElementById('eventId').value = '';
-        // Set default date to today
         document.getElementById('eventDate').value = new Date().toISOString().split('T')[0];
         document.getElementById('eventStatus').value = 'Scheduled';
     }
@@ -131,7 +127,6 @@ async function openEventModal(id = null) {
     modal.style.display = 'flex';
 }
 
-// Close modal
 function closeEventModal() {
     document.getElementById('eventModal').style.display = 'none';
     currentEventId = null;
@@ -144,6 +139,9 @@ document.getElementById('eventForm')?.addEventListener('submit', async (e) => {
     const token = localStorage.getItem('token');
     const eventId = document.getElementById('eventId').value;
     
+    // Get user from localStorage
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    
     const eventData = {
         title: document.getElementById('eventTitle').value,
         description: document.getElementById('eventDescription').value,
@@ -151,8 +149,8 @@ document.getElementById('eventForm')?.addEventListener('submit', async (e) => {
         start_time: document.getElementById('startTime').value || null,
         end_time: document.getElementById('endTime').value || null,
         location: document.getElementById('eventLocation').value,
-        max_attendees: document.getElementById('maxAttendees').value ? parseInt(document.getElementById('maxAttendees').value) : null,
-        status: document.getElementById('eventStatus').value
+        status: document.getElementById('eventStatus').value,
+        created_by: user.id || null
     };
     
     const url = eventId ? `${API_BASE_URL}/events/${eventId}` : `${API_BASE_URL}/events`;
@@ -204,7 +202,8 @@ async function deleteEvent(id) {
         if (response.ok) {
             loadEvents();
         } else {
-            alert('Failed to delete event');
+            const error = await response.json();
+            alert(error.message || 'Failed to delete event');
         }
     } catch (error) {
         console.error('Error:', error);
@@ -235,8 +234,8 @@ async function viewRsvp(eventId) {
                 <ul style="list-style: none; padding: 0;">
                     ${attendees.map(attendee => `
                         <li style="padding: 0.75rem 0; border-bottom: 1px solid #e5e7eb;">
-                            <strong>${attendee.member_name}</strong><br>
-                            <small>Status: ${attendee.status}</small>
+                            <strong>${attendee.member_name || attendee.name || 'Unknown'}</strong><br>
+                            <small>Status: ${attendee.status || 'Confirmed'}</small>
                         </li>
                     `).join('')}
                 </ul>
@@ -255,7 +254,6 @@ function closeRsvpModal() {
     document.getElementById('rsvpModal').style.display = 'none';
 }
 
-// Helper functions
 function formatDate(dateString) {
     if (!dateString) return '';
     const date = new Date(dateString);
@@ -269,7 +267,6 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
-// Close modals when clicking outside
 window.onclick = function(event) {
     const eventModal = document.getElementById('eventModal');
     const rsvpModal = document.getElementById('rsvpModal');

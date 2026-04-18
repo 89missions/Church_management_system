@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#4F46E5">
+    <title>Member Dashboard | Winners Chapel</title>
+    <link rel="manifest" href="./manifest.json">
+    <link rel="stylesheet" href="./css/style.css">
+    <style>
+        .dashboard-container {
+            max-width: 1400px;
+            margin: 80px auto 2rem;
+            padding: 0 2rem;
+        }
+
+        .dashboard-header {
+            background: white;
+            border-radius: 20px;
+            padding: 1.5rem 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .welcome-section h1 {
+            font-size: 1.5rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .welcome-section p {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        .member-since {
+            background: #f0fdf4;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            color: #065f46;
+            display: inline-block;
+        }
+
+        .logout-btn {
+            background: #dc2626;
+            color: white;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        .two-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+            margin-bottom: 1.5rem;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .card-header h3 {
+            font-size: 1.2rem;
+            color: var(--dark);
+        }
+
+        .view-all {
+            font-size: 0.8rem;
+            color: var(--primary);
+            text-decoration: none;
+        }
+
+        .event-item, .offering-item, .attendance-item {
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .event-date {
+            background: var(--primary);
+            color: white;
+            padding: 0.2rem 0.6rem;
+            border-radius: 10px;
+            font-size: 0.7rem;
+        }
+
+        .offering-amount {
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .attendance-badge {
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+        }
+
+        .attendance-present {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .attendance-absent {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        /* Streak Section */
+        .streak-card {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            text-align: center;
+            padding: 1.5rem;
+            border-radius: 20px;
+            margin-bottom: 1.5rem;
+        }
+
+        .streak-number {
+            font-size: 3rem;
+            font-weight: bold;
+        }
+
+        .streak-label {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+
+        .fire-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Profile Section */
+        .profile-row {
+            display: flex;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .profile-label {
+            width: 120px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .profile-value {
+            flex: 1;
+            color: var(--gray);
+        }
+
+        .change-password-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 0.6rem 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 1rem;
+            font-weight: 500;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .close-modal {
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+        }
+
+        .save-password-btn {
+            background: var(--primary);
+            color: white;
+            width: 100%;
+            padding: 0.8rem;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .alert {
+            padding: 0.8rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+        }
+
+        .alert-success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .alert-error {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: var(--gray);
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-container {
+                padding: 0 1rem;
+            }
+            .two-columns {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Header -->
+        <div class="dashboard-header">
+            <div class="welcome-section">
+                <h1 id="welcomeName">Welcome back!</h1>
+                <p><span class="member-since" id="memberSince">Loading...</span></p>
+            </div>
+            <button class="logout-btn" onclick="logout()">🚪 Logout</button>
+        </div>
+
+        <div class="two-columns">
+            <!-- Left Column -->
+            <div>
+                <!-- Streak Card -->
+                <div class="streak-card">
+                    <div class="fire-icon">🔥</div>
+                    <div class="streak-number" id="streakCount">0</div>
+                    <div class="streak-label">Week Attendance Streak</div>
+                    <small style="opacity: 0.8;">Consecutive Sundays attended</small>
+                </div>
+
+                <!-- Upcoming Events -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>📅 Upcoming Events</h3>
+                        <a href="events.html" class="view-all">View all →</a>
+                    </div>
+                    <div id="upcomingEvents">
+                        <div class="loading">Loading events...</div>
+                    </div>
+                </div>
+
+                <!-- My Attendance -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>📋 My Attendance History</h3>
+                    </div>
+                    <div id="attendanceHistory">
+                        <div class="loading">Loading attendance...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column -->
+            <div>
+                <!-- My Offerings -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>💰 My Recent Offerings</h3>
+                    </div>
+                    <div id="myOfferings">
+                        <div class="loading">Loading offerings...</div>
+                    </div>
+                </div>
+
+                <!-- My Profile -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3>👤 My Profile</h3>
+                    </div>
+                    <div id="profileInfo">
+                        <div class="loading">Loading profile...</div>
+                    </div>
+                    <button class="change-password-btn" onclick="openPasswordModal()">🔐 Change Password</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Change Password Modal -->
+    <div id="passwordModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Change Password</h3>
+                <span class="close-modal" onclick="closePasswordModal()">&times;</span>
+            </div>
+            <div id="passwordAlert"></div>
+            <form id="passwordForm">
+                <div class="form-group">
+                    <label>Current Password</label>
+                    <input type="password" id="currentPassword" required>
+                </div>
+                <div class="form-group">
+                    <label>New Password</label>
+                    <input type="password" id="newPassword" required minlength="6">
+                </div>
+                <div class="form-group">
+                    <label>Confirm New Password</label>
+                    <input type="password" id="confirmPassword" required>
+                </div>
+                <button type="submit" class="save-password-btn">Update Password</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="./js/auth.js"></script>
+    <script src="./js/member-dashboard.js"></script>
+</body>
+</html>

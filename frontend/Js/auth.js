@@ -17,6 +17,7 @@ document.getElementById('signinForm')?.addEventListener('submit', async (e) => {
         showError('Please select your role');
         return;
     }
+    console.log(email,password,role)
     
     // Show loading state
     const submitBtn = document.querySelector('.signin-btn');
