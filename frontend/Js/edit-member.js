@@ -1,4 +1,6 @@
 // Get member ID from URL
+
+
 const urlParams = new URLSearchParams(window.location.search);
 const memberId = urlParams.get('id');
 
