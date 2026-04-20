@@ -29,6 +29,7 @@ const getMembersWithId= async (req,res)=>{
             return res.status(404).json({ message: "Member not found" });
         }
         res.status(200).json(getmemberwithid.rows[0])
+        
     } catch (error) {
         console.error(error)
         res.status(500).json({"message":"Internal Server Error"})

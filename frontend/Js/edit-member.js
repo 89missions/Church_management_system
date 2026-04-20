@@ -1,5 +1,5 @@
 // Get member ID from URL
-
+import { API_BASE_URL } from './config.js';
 
 const urlParams = new URLSearchParams(window.location.search);
 const memberId = urlParams.get('id');

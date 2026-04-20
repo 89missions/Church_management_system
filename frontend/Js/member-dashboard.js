@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:3000/api';
+import { API_BASE_URL } from './config.js';
 let currentMember = null;
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -286,6 +286,7 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
+
 // Close modal when clicking outside
 window.onclick = function(event) {
     const modal = document.getElementById('passwordModal');
@@ -293,3 +294,12 @@ window.onclick = function(event) {
         closePasswordModal();
     }
 }
+
+const logoutbtn = document.querySelector('.logout-btn')
+
+logoutbtn.addEventListener('click',()=>{
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    localStorage.removeItem('role');
+    window.location.href = 'signin.html';
+})

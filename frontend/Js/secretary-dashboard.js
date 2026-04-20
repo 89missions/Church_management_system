@@ -1,3 +1,5 @@
+import { API_BASE_URL } from './config.js';
+
 // Load dashboard data
 async function loadDashboardData() {
     const token = localStorage.getItem('token');
@@ -270,5 +272,13 @@ installBtn?.addEventListener('click', async () => {
     }
 });
 
+const logoutbtn = document.querySelector('.logout-btn')
+
+logoutbtn.addEventListener('click',()=>{
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    localStorage.removeItem('role');
+    window.location.href = 'signin.html';
+})
 // Load dashboard on page load
 document.addEventListener('DOMContentLoaded', loadDashboardData);

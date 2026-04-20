@@ -1,3 +1,5 @@
+import { API_BASE_URL } from './config.js';
+
 document.getElementById('addMemberForm')?.addEventListener('submit', async (e) => {
     e.preventDefault();
     

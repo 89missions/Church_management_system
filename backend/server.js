@@ -11,7 +11,6 @@ app.use(cors({
 }))
 app.use(express.json())
 
-console.log('auth route..')
 app.use('/api/auth/', require('./routes/api/authroute.js'))
 
 app.use(verifyJWT)

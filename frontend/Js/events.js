@@ -1,3 +1,5 @@
+import { API_BASE_URL } from './config.js';
+
 let currentEventId = null;
 
 document.addEventListener('DOMContentLoaded', () => {

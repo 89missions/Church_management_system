@@ -4,6 +4,8 @@ const verifyJWT = async (req, res, next) => {
     try {
         // Get the token from the Authorization header
         const authHeader = req.headers['authorization'] || req.headers['Authorization'];
+
+
         if (!authHeader) {
             return res.status(401).json({ message: "Authorization header missing." });
         }

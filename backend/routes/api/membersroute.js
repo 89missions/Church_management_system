@@ -6,7 +6,7 @@ const verifyRoles = require('../../middlewares/verifyRoles')
 
 router.post('/addmember',verifyRoles('secretary'),postMembers)
 router.get('/',verifyRoles('secretary'),getMembers)
-router.get('/:id',verifyRoles('secretary'),getMembersWithId)
+router.get('/:id', verifyRoles(['secretary', 'member']), getMembersWithId)
 router.put('/:id',verifyRoles('secretary'),updateMembers)
 router.delete('/delete/:id',verifyRoles('secretary'),deleteMembers)
 
