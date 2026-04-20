@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <meta name="theme-color" content="#4F46E5">
+    <title>Usher Dashboard | Winners Chapel</title>
+    <link rel="manifest" href="./manifest.json">
+    <link rel="stylesheet" href="./css/style.css">
+    <style>
+        .dashboard-container {
+            max-width: 1400px;
+            margin: 80px auto 2rem;
+            padding: 0 2rem;
+        }
+
+        .dashboard-header {
+            background: white;
+            border-radius: 20px;
+            padding: 1.5rem 2rem;
+            margin-bottom: 2rem;
+            box-shadow: var(--shadow);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .welcome-section h1 {
+            font-size: 1.5rem;
+            margin-bottom: 0.25rem;
+        }
+
+        .welcome-section p {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        .service-date {
+            background: #f0fdf4;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            color: #065f46;
+            display: inline-block;
+            margin-top: 0.5rem;
+        }
+
+        .logout-btn {
+            background: #dc2626;
+            color: white;
+            border: none;
+            padding: 0.6rem 1.2rem;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 20px;
+            padding: 1.5rem;
+            text-align: center;
+            box-shadow: var(--shadow);
+        }
+
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: bold;
+        }
+
+        .stat-number.present {
+            color: #10b981;
+        }
+
+        .stat-number.absent {
+            color: #ef4444;
+        }
+
+        .stat-number.pending {
+            color: #f59e0b;
+        }
+
+        .stat-label {
+            color: var(--gray);
+            margin-top: 0.5rem;
+        }
+
+        .two-columns {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 1.5rem;
+            box-shadow: var(--shadow);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .card-header h3 {
+            font-size: 1.2rem;
+            color: var(--dark);
+        }
+
+        .search-box {
+            width: 100%;
+            padding: 0.8rem;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            font-size: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .search-results {
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .search-result-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .member-info {
+            flex: 1;
+        }
+
+        .member-name {
+            font-weight: 500;
+        }
+
+        .member-phone {
+            font-size: 0.8rem;
+            color: var(--gray);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .present-btn, .absent-btn {
+            padding: 0.4rem 0.8rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.8rem;
+        }
+
+        .present-btn {
+            background: #10b981;
+            color: white;
+        }
+
+        .absent-btn {
+            background: #ef4444;
+            color: white;
+        }
+
+        .pending-list {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .pending-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .pending-status {
+            padding: 0.2rem 0.6rem;
+            border-radius: 20px;
+            font-size: 0.7rem;
+        }
+
+        .status-present {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .status-absent {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .remove-btn {
+            background: none;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            color: var(--gray);
+        }
+
+        .save-all-btn {
+            background: var(--primary);
+            color: white;
+            width: 100%;
+            padding: 1rem;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 1rem;
+        }
+
+        .save-all-btn:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+
+        .alert {
+            padding: 0.8rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+        }
+
+        .alert-success {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .alert-error {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: var(--gray);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 2rem;
+            color: var(--gray);
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-container {
+                padding: 0 1rem;
+            }
+            .two-columns {
+                grid-template-columns: 1fr;
+            }
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Header -->
+        <div class="dashboard-header">
+            <div class="welcome-section">
+                <h1>🚪 Usher Dashboard</h1>
+                <p>Welcome back, <span id="usherName">Loading...</span></p>
+                <div class="service-date" id="serviceDate"></div>
+            </div>
+            <button class="logout-btn" onclick="logout()">🚪 Logout</button>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number present" id="presentCount">0</div>
+                <div class="stat-label">✅ Present</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number absent" id="absentCount">0</div>
+                <div class="stat-label">❌ Absent</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number pending" id="pendingCount">0</div>
+                <div class="stat-label">⏳ Pending</div>
+            </div>
+        </div>
+
+        <div class="two-columns">
+            <!-- Left Column: Search & Mark -->
+            <div class="card">
+                <div class="card-header">
+                    <h3>🔍 Mark Attendance</h3>
+                </div>
+                <input type="text" id="searchInput" class="search-box" placeholder="Search by name or phone...">
+                <div id="searchResults" class="search-results">
+                    <div class="empty-state">Start typing to search members...</div>
+                </div>
+            </div>
+
+            <!-- Right Column: Pending List -->
+            <div class="card">
+                <div class="card-header">
+                    <h3>📋 Pending List</h3>
+                    <span id="pendingListCount" style="background: #e5e7eb; padding: 0.2rem 0.6rem; border-radius: 20px; font-size: 0.8rem;">0</span>
+                </div>
+                <div id="pendingList" class="pending-list">
+                    <div class="empty-state">No members marked yet</div>
+                </div>
+                <button id="saveAllBtn" class="save-all-btn" onclick="saveAllAttendance()">💾 Save All Attendance</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="alertMessage" style="position: fixed; bottom: 20px; right: 20px; z-index: 1000;"></div>
+
+    <script type="module" src="./js/auth.js"></script>
+    <script type="module" src="./js/usher-dashboard.js"></script>
+</body>
+</html>
