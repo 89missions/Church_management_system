@@ -1,7 +1,4 @@
-const API_BASE_URL = window.location.hostname === 'localhost' 
-    ? 'http://localhost:3000/api'
-    : 'https://church-management-system-hj7g.onrender.com/api';
-
+import { API_BASE_URL } from "./config.js";
 let refreshInterval = null;
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -264,3 +261,12 @@ window.addEventListener('beforeunload', () => {
         clearInterval(refreshInterval);
     }
 });
+
+const logoutbtn = document.querySelector('.logout-btn')
+
+logoutbtn.addEventListener('click',()=>{
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    localStorage.removeItem('role');
+    window.location.href = 'signin.html';
+})

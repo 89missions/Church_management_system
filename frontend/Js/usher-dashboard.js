@@ -1,4 +1,4 @@
-import API_BASE_URL from './config'
+import { API_BASE_URL } from "./config.js";
 
 let allMembers = [];
 let pendingAttendance = []; // { member_id, first_name, last_name, phone, attended }
@@ -280,21 +280,12 @@ function showAlert(message, type) {
         alertDiv.innerHTML = '';
     }, 3000);
 }
-/*
-// Response
-[
-    { member_id: 'uuid', first_name: 'John', last_name: 'Doe', phone: '0244123456', attended: true }
-]
-    // Request body
-{
-    "service_date": "2026-04-20",
-    "service_type": "Sunday",
-    "records": [
-        { "member_id": "uuid-1", "attended": true },
-        { "member_id": "uuid-2", "attended": false }
-    ]
-}
 
-// Response
-{ "success": true, "message": "Attendance saved for X members" }
-*/
+const logoutbtn = document.querySelector('.logout-btn')
+
+logoutbtn.addEventListener('click',()=>{
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    localStorage.removeItem('role');
+    window.location.href = 'signin.html';
+})
