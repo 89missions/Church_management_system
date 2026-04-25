@@ -1,4 +1,5 @@
 import { API_BASE_URL } from './config.js';
+import { fetchWithAuth } from './auth.js';
 
 let currentEventId = null;
 
@@ -16,9 +17,7 @@ async function loadEvents() {
     }
 
     try {
-        const response = await fetch(`${API_BASE_URL}/events`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
+        const response = await fetchWithAuth(`${API_BASE_URL}/events`);
 
         if (response.status === 401) {
             localStorage.clear();
@@ -97,11 +96,8 @@ async function openEventModal(id = null) {
         currentEventId = id;
         document.getElementById('modalTitle').textContent = 'Edit Event';
         
-        const token = localStorage.getItem('token');
         try {
-            const response = await fetch(`${API_BASE_URL}/events/${id}`, {
-                headers: { 'Authorization': `Bearer ${token}` }
-            });
+            const response = await fetchWithAuth(`${API_BASE_URL}/events/${id}`);
             
             if (response.ok) {
                 const event = await response.json();
@@ -138,7 +134,6 @@ function closeEventModal() {
 document.getElementById('eventForm')?.addEventListener('submit', async (e) => {
     e.preventDefault();
     
-    const token = localStorage.getItem('token');
     const eventId = document.getElementById('eventId').value;
     
     // Get user from localStorage
@@ -164,12 +159,9 @@ document.getElementById('eventForm')?.addEventListener('submit', async (e) => {
     saveBtn.disabled = true;
     
     try {
-        const response = await fetch(url, {
+        const response = await fetchWithAuth(url, {
             method: method,
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(eventData)
         });
         
@@ -193,12 +185,9 @@ document.getElementById('eventForm')?.addEventListener('submit', async (e) => {
 async function deleteEvent(id) {
     if (!confirm('Are you sure you want to delete this event?')) return;
     
-    const token = localStorage.getItem('token');
-    
     try {
-        const response = await fetch(`${API_BASE_URL}/events/${id}`, {
-            method: 'DELETE',
-            headers: { 'Authorization': `Bearer ${token}` }
+        const response = await fetchWithAuth(`${API_BASE_URL}/events/${id}`, {
+            method: 'DELETE'
         });
         
         if (response.ok) {
@@ -215,12 +204,8 @@ async function deleteEvent(id) {
 
 // View RSVP list
 async function viewRsvp(eventId) {
-    const token = localStorage.getItem('token');
-    
     try {
-        const response = await fetch(`${API_BASE_URL}/events/${eventId}/rsvp`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
+        const response = await fetchWithAuth(`${API_BASE_URL}/events/${eventId}/rsvp`);
         
         if (!response.ok) throw new Error('Failed to load RSVPs');
         

@@ -1,4 +1,6 @@
 import { API_BASE_URL } from './config.js';
+import { fetchWithAuth } from './auth.js';
+
 let currentMember = null;
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -18,14 +20,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 });
 
 async function loadMemberData() {
-    const token = localStorage.getItem('token');
     const user = JSON.parse(localStorage.getItem('user') || '{}');
     currentMember = user;
     
     try {
-        const response = await fetch(`${API_BASE_URL}/members/${user.id}`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
+        const response = await fetchWithAuth(`${API_BASE_URL}/members/${user.id}`);
         
         if (response.ok) {
             const member = await response.json();
@@ -75,12 +74,8 @@ function displayProfile(member) {
 }
 
 async function loadUpcomingEvents() {
-    const token = localStorage.getItem('token');
-    
     try {
-        const response = await fetch(`${API_BASE_URL}/events`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
+        const response = await fetchWithAuth(`${API_BASE_URL}/events`);
         
         if (response.ok) {
             const allEvents = await response.json();
@@ -112,15 +107,12 @@ async function loadUpcomingEvents() {
 }
 
 async function loadMyOfferings() {
-    const token = localStorage.getItem('token');
     const memberId = currentMember?.id;
     
     if (!memberId) return;
     
     try {
-        const response = await fetch(`${API_BASE_URL}/offerings/member/${memberId}`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
+        const response = await fetchWithAuth(`${API_BASE_URL}/offerings/member/${memberId}`);
         
         if (response.ok) {
             const offerings = await response.json();
@@ -144,15 +136,12 @@ async function loadMyOfferings() {
 }
 
 async function loadAttendanceHistory() {
-    const token = localStorage.getItem('token');
     const memberId = currentMember?.id;
     
     if (!memberId) return;
     
     try {
-        const response = await fetch(`${API_BASE_URL}/attendance/member/${memberId}`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
+        const response = await fetchWithAuth(`${API_BASE_URL}/attendance/member/${memberId}`);
         
         if (response.ok) {
             const attendance = await response.json();
@@ -178,15 +167,12 @@ async function loadAttendanceHistory() {
 }
 
 async function loadStreak() {
-    const token = localStorage.getItem('token');
     const memberId = currentMember?.id;
     
     if (!memberId) return;
     
     try {
-        const response = await fetch(`${API_BASE_URL}/attendance/streak/${memberId}`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
+        const response = await fetchWithAuth(`${API_BASE_URL}/attendance/streak/${memberId}`);
         
         if (response.ok) {
             const data = await response.json();
@@ -199,12 +185,8 @@ async function loadStreak() {
 }
 
 async function loadSundaySummary() {
-    const token = localStorage.getItem('token');
-    
     try {
-        const response = await fetch(`${API_BASE_URL}/sunday-summary/latest`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
+        const response = await fetchWithAuth(`${API_BASE_URL}/sunday-summary/latest`);
         
         if (response.ok) {
             const summary = await response.json();
@@ -291,15 +273,10 @@ document.getElementById('passwordForm')?.addEventListener('submit', async (e) =>
         return;
     }
     
-    const token = localStorage.getItem('token');
-    
     try {
-        const response = await fetch(`${API_BASE_URL}/auth/change-password`, {
+        const response = await fetchWithAuth(`${API_BASE_URL}/auth/change-password`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 current_password: currentPassword,
                 new_password: newPassword
@@ -357,12 +334,3 @@ window.onclick = function(event) {
         closePasswordModal();
     }
 }
-
-const logoutbtn = document.querySelector('.logout-btn')
-
-logoutbtn.addEventListener('click',()=>{
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    localStorage.removeItem('role');
-    window.location.href = 'signin.html';
-})

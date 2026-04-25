@@ -1,5 +1,6 @@
 // Get member ID from URL
 import { API_BASE_URL } from './config.js';
+import { fetchWithAuth } from './auth.js';
 
 const urlParams = new URLSearchParams(window.location.search);
 const memberId = urlParams.get('id');
@@ -15,19 +16,8 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 async function loadMemberData() {
-    const token = localStorage.getItem('token');
-    
-    if (!token) {
-        window.location.href = 'signin.html';
-        return;
-    }
-    
     try {
-        const response = await fetch(`${API_BASE_URL}/members/${memberId}`, {
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        });
+        const response = await fetchWithAuth(`${API_BASE_URL}/members/${memberId}`);
         
         if (response.status === 401) {
             localStorage.clear();
@@ -81,8 +71,6 @@ function populateForm(member) {
 document.getElementById('editMemberForm')?.addEventListener('submit', async (e) => {
     e.preventDefault();
     
-    const token = localStorage.getItem('token');
-    
     // Get selected positions
     const positionsSelect = document.getElementById('positions');
     const selectedPositions = Array.from(positionsSelect.selectedOptions).map(opt => opt.value);
@@ -120,12 +108,9 @@ document.getElementById('editMemberForm')?.addEventListener('submit', async (e) 
     submitBtn.disabled = true;
     
     try {
-        const response = await fetch(`${API_BASE_URL}/members/${memberId}`, {
+        const response = await fetchWithAuth(`${API_BASE_URL}/members/${memberId}`, {
             method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(memberData)
         });
         

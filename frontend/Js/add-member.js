@@ -1,4 +1,5 @@
 import { API_BASE_URL } from './config.js';
+import { fetchWithAuth } from './auth.js';
 
 document.getElementById('addMemberForm')?.addEventListener('submit', async (e) => {
     e.preventDefault();
@@ -39,14 +40,9 @@ document.getElementById('addMemberForm')?.addEventListener('submit', async (e) =
     submitBtn.disabled = true;
     
     try {
-        const token = localStorage.getItem('token');
-        
-        const response = await fetch(`${API_BASE_URL}/members/addmember`, {
+        const response = await fetchWithAuth(`${API_BASE_URL}/members/addmember`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(memberData)
         });
         
@@ -96,27 +92,6 @@ function getSelectedPositions() {
         selected.unshift('member');
     }
     return selected;
-}
-
-/*
-function generateDefaultPassword(firstName, phone) {
-    const churchCode = 'WC';
-    const last4 = phone.slice(-4);
-    const randomNum = Math.floor(Math.random() * 100);
-    return `${churchCode}${last4}${randomNum}`;
-}
-*/
-
-// Copy password to clipboard
-function copyPassword() {
-    const password = document.getElementById('defaultPassword').textContent;
-    navigator.clipboard.writeText(password);
-    const copyBtn = document.querySelector('.copy-btn');
-    const originalText = copyBtn.textContent;
-    copyBtn.textContent = 'Copied!';
-    setTimeout(() => {
-        copyBtn.textContent = originalText;
-    }, 2000);
 }
 
 // Show alert message

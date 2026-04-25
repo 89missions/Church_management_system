@@ -1,14 +1,8 @@
 import { API_BASE_URL } from './config.js';
+import { fetchWithAuth } from './auth.js';
 
 // Load dashboard data
 async function loadDashboardData() {
-    const token = localStorage.getItem('token');
-    
-    if (!token) {
-        window.location.href = 'signin.html';
-        return;
-    }
-
     try {
         // Load stats
         await loadStats();
@@ -30,12 +24,8 @@ async function loadDashboardData() {
 
 // Load stats
 async function loadStats() {
-    const token = localStorage.getItem('token');
-    
     try {
-        const response = await fetch(`${API_BASE_URL}/dashboard/stats`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
+        const response = await fetchWithAuth(`${API_BASE_URL}/dashboard/stats`);
         
         if (response.ok) {
             const stats = await response.json();
@@ -53,7 +43,6 @@ async function loadStats() {
 
 // Load Sunday summary
 async function loadSundaySummary() {
-    const token = localStorage.getItem('token');
     const summaryDate = document.getElementById('summaryDate');
     const summaryContent = document.getElementById('summaryContent');
     
@@ -63,9 +52,7 @@ async function loadSundaySummary() {
     summaryDate.textContent = formatDateForDisplay(lastSunday);
     
     try {
-        const response = await fetch(`${API_BASE_URL}/sunday-summary/latest`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
+        const response = await fetchWithAuth(`${API_BASE_URL}/sunday-summary/latest`);
         
         if (response.ok) {
             const summary = await response.json();
@@ -126,8 +113,15 @@ function showEmptySummary() {
 }
 
 // Event listeners instead of inline onclick
-document.querySelector('.edit-summary-btn').addEventListener('click', openSummaryModal);
-document.querySelector('.cancel-btn').addEventListener('click', closeSummaryModal);
+const editSummaryBtn = document.querySelector('.edit-summary-btn');
+const cancelBtn = document.querySelector('.cancel-btn');
+
+if (editSummaryBtn) {
+    editSummaryBtn.addEventListener('click', openSummaryModal);
+}
+if (cancelBtn) {
+    cancelBtn.addEventListener('click', closeSummaryModal);
+}
 
 // Open modal to edit summary
 function openSummaryModal() {
@@ -149,56 +143,54 @@ function closeSummaryModal() {
     modal.style.display = 'none';
 }
 
-
 // Save Sunday summary
-document.getElementById('summaryForm')?.addEventListener('submit', async (e) => {
-    e.preventDefault();
-    
-    const token = localStorage.getItem('token');
-    const summaryData = {
-        sermon_text: document.getElementById('sermonText').value,
-        sermon_title: document.getElementById('sermonTitle').value,
-        teaching_text: document.getElementById('teachingText').value,
-        offering_total: parseFloat(document.getElementById('offeringTotal').value) || 0,
-        highlights: document.getElementById('highlights').value,
-        summary_date: getLastSunday(new Date()).toISOString().split('T')[0]
-    };
-    
-    const saveBtn = document.querySelector('.save-btn');
-    const originalText = saveBtn.textContent;
-    saveBtn.textContent = 'Saving...';
-    saveBtn.disabled = true;
-    
-    try {
-        const response = await fetch(`${API_BASE_URL}/sunday-summary`, {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
-            body: JSON.stringify(summaryData)
-        });
+const summaryForm = document.getElementById('summaryForm');
+if (summaryForm) {
+    summaryForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
         
-        if (response.ok) {
-            alert('Sunday summary saved successfully!');
+        const summaryData = {
+            sermon_text: document.getElementById('sermonText').value,
+            sermon_title: document.getElementById('sermonTitle').value,
+            teaching_text: document.getElementById('teachingText').value,
+            offering_total: parseFloat(document.getElementById('offeringTotal').value) || 0,
+            highlights: document.getElementById('highlights').value,
+            summary_date: getLastSunday(new Date()).toISOString().split('T')[0]
+        };
+        
+        const saveBtn = document.querySelector('.save-btn');
+        const originalText = saveBtn.textContent;
+        saveBtn.textContent = 'Saving...';
+        saveBtn.disabled = true;
+        
+        try {
+            const response = await fetchWithAuth(`${API_BASE_URL}/sunday-summary`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(summaryData)
+            });
+            
+            if (response.ok) {
+                alert('Sunday summary saved successfully!');
+                closeSummaryModal();
+                loadSundaySummary(); // Refresh display
+            } else {
+                const error = await response.json();
+                alert(error.message || 'Error saving summary');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert('Error saving summary. Make sure backend is running.');
+            // Demo: save locally
+            localStorage.setItem('lastSundaySummary', JSON.stringify(summaryData));
+            displaySummary(summaryData);
             closeSummaryModal();
-            loadSundaySummary(); // Refresh display
-        } else {
-            const error = await response.json();
-            alert(error.message || 'Error saving summary');
+        } finally {
+            saveBtn.textContent = originalText;
+            saveBtn.disabled = false;
         }
-    } catch (error) {
-        console.error('Error:', error);
-        alert('Error saving summary. Make sure backend is running.');
-        // Demo: save locally
-        localStorage.setItem('lastSundaySummary', JSON.stringify(summaryData));
-        displaySummary(summaryData);
-        closeSummaryModal();
-    } finally {
-        saveBtn.textContent = originalText;
-        saveBtn.disabled = false;
-    }
-});
+    });
+}
 
 // Helper: Get last Sunday
 function getLastSunday(date) {
@@ -265,23 +257,16 @@ window.addEventListener('beforeinstallprompt', (e) => {
     if (installBtn) installBtn.style.display = 'block';
 });
 
-installBtn?.addEventListener('click', async () => {
-    if (deferredPrompt) {
-        deferredPrompt.prompt();
-        const { outcome } = await deferredPrompt.userChoice;
-        if (outcome === 'accepted') installBtn.style.display = 'none';
-        deferredPrompt = null;
-    }
-});
-
-const logoutbtn = document.querySelector('.logout-btn')
-
-logoutbtn.addEventListener('click',()=>{
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    localStorage.removeItem('role');
-    window.location.href = 'signin.html';
-})
+if (installBtn) {
+    installBtn.addEventListener('click', async () => {
+        if (deferredPrompt) {
+            deferredPrompt.prompt();
+            const { outcome } = await deferredPrompt.userChoice;
+            if (outcome === 'accepted') installBtn.style.display = 'none';
+            deferredPrompt = null;
+        }
+    });
+}
 
 // Make functions available to inline onclick handlers
 window.openSummaryModal = openSummaryModal;

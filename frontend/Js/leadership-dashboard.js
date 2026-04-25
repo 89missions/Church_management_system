@@ -1,4 +1,6 @@
 import { API_BASE_URL } from "./config.js";
+import { fetchWithAuth } from './auth.js';
+
 let refreshInterval = null;
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -38,12 +40,8 @@ async function loadDashboardData() {
 }
 
 async function loadStats() {
-    const token = localStorage.getItem('token');
-    
     try {
-        const response = await fetch(`${API_BASE_URL}/leadership/stats`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
+        const response = await fetchWithAuth(`${API_BASE_URL}/leadership/stats`);
         
         if (response.ok) {
             const stats = await response.json();
@@ -58,12 +56,8 @@ async function loadStats() {
 }
 
 async function loadAttendanceTrend() {
-    const token = localStorage.getItem('token');
-    
     try {
-        const response = await fetch(`${API_BASE_URL}/leadership/attendance-trend`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
+        const response = await fetchWithAuth(`${API_BASE_URL}/leadership/attendance-trend`);
         
         if (response.ok) {
             const data = await response.json();
@@ -102,12 +96,8 @@ function renderAttendanceChart(data) {
 }
 
 async function loadOfferingSummary() {
-    const token = localStorage.getItem('token');
-    
     try {
-        const response = await fetch(`${API_BASE_URL}/leadership/offering-summary`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
+        const response = await fetchWithAuth(`${API_BASE_URL}/leadership/offering-summary`);
         
         if (response.ok) {
             const offerings = await response.json();
@@ -136,12 +126,8 @@ function renderOfferingSummary(offerings) {
 }
 
 async function loadMemberBreakdown() {
-    const token = localStorage.getItem('token');
-    
     try {
-        const response = await fetch(`${API_BASE_URL}/leadership/member-breakdown`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
+        const response = await fetchWithAuth(`${API_BASE_URL}/leadership/member-breakdown`);
         
         if (response.ok) {
             const breakdown = await response.json();
@@ -179,12 +165,8 @@ function renderMemberBreakdown(breakdown) {
 }
 
 async function loadUpcomingEvents() {
-    const token = localStorage.getItem('token');
-    
     try {
-        const response = await fetch(`${API_BASE_URL}/events/upcoming?limit=5`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
+        const response = await fetchWithAuth(`${API_BASE_URL}/events/upcoming?limit=5`);
         
         if (response.ok) {
             const events = await response.json();
@@ -216,12 +198,8 @@ function renderUpcomingEvents(events) {
 }
 
 async function loadSundaySummary() {
-    const token = localStorage.getItem('token');
-    
     try {
-        const response = await fetch(`${API_BASE_URL}/sunday-summary/latest`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
+        const response = await fetchWithAuth(`${API_BASE_URL}/sunday-summary/latest`);
         
         if (response.ok) {
             const summary = await response.json();
@@ -330,12 +308,3 @@ window.addEventListener('beforeunload', () => {
         clearInterval(refreshInterval);
     }
 });
-
-const logoutbtn = document.querySelector('.logout-btn')
-
-logoutbtn.addEventListener('click',()=>{
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    localStorage.removeItem('role');
-    window.location.href = 'signin.html';
-})

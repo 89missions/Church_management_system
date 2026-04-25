@@ -1,4 +1,3 @@
-// Authentication handling
 import { API_BASE_URL } from './config.js';
 
 // Handle sign in form submission
@@ -9,17 +8,13 @@ document.getElementById('signinForm')?.addEventListener('submit', async (e) => {
     const password = document.getElementById('password').value;
     const role = document.getElementById('role').value;
     
-    // Clear previous error
     hideError();
     
-    // Validate role is selected
-    if (!role ||!password ||!email) {
-        showError('Please select your role');
+    if (!role || !password || !email) {
+        showError('Please fill in all fields');
         return;
     }
-    console.log(email,password,role)
     
-    // Show loading state
     const submitBtn = document.querySelector('.signin-btn');
     const originalText = submitBtn.textContent;
     submitBtn.textContent = 'Signing in...';
@@ -28,26 +23,18 @@ document.getElementById('signinForm')?.addEventListener('submit', async (e) => {
     try {
         const response = await fetch(`${API_BASE_URL}/auth/login`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ 
-                email, 
-                password, 
-                role 
-            })
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email, password, role })
         });
         
         const data = await response.json();
-        console.log(data)
         
         if (response.ok && data.success) {
-            // Store user data
             localStorage.setItem('token', data.access_token);
+            localStorage.setItem('refresh_token', data.refresh_token);
             localStorage.setItem('user', JSON.stringify(data.user));
             localStorage.setItem('role', role);
             
-            // Redirect based on role
             redirectToDashboard(role);
         } else {
             showError(data.message || 'Invalid email, password, or role combination');
@@ -63,22 +50,13 @@ document.getElementById('signinForm')?.addEventListener('submit', async (e) => {
 
 // Redirect based on role
 function redirectToDashboard(role) {
-    switch(role) {
-        case 'secretary':
-            window.location.href = 'dashboard-secretary.html';
-            break;
-        case 'leadership':
-            window.location.href = 'dashboard-leadership.html';
-            break;
-        case 'member':
-            window.location.href = 'dashboard-member.html';
-            break;
-        case 'usher':
-            window.location.href = 'dashboard-usher.html';
-            break;
-        default:
-            window.location.href = 'index.html';
-    }
+    const dashboards = {
+        'secretary': 'dashboard-secretary.html',
+        'leadership': 'dashboard-leadership.html',
+        'member': 'dashboard-member.html',
+        'usher': 'dashboard-usher.html'
+    };
+    window.location.href = dashboards[role] || 'index.html';
 }
 
 // Show error message
@@ -87,29 +65,90 @@ function showError(message) {
     if (errorDiv) {
         errorDiv.textContent = message;
         errorDiv.style.display = 'block';
-        
-        // Auto hide after 5 seconds
-        setTimeout(() => {
-            hideError();
-        }, 5000);
+        setTimeout(() => hideError(), 5000);
     }
 }
 
-// Hide error message
 function hideError() {
     const errorDiv = document.getElementById('errorMessage');
-    if (errorDiv) {
-        errorDiv.style.display = 'none';
+    if (errorDiv) errorDiv.style.display = 'none';
+}
+
+// Refresh access token when expired
+async function refreshAccessToken() {
+    const refresh_token = localStorage.getItem('refresh_token');
+    
+    if (!refresh_token) return false;
+    
+    try {
+        const response = await fetch(`${API_BASE_URL}/refresh/token`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ refresh_token })
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            localStorage.setItem('token', data.access_token);
+            return true;
+        }
+    } catch (error) {
+        console.error('Token refresh failed:', error);
     }
+    
+    return false;
+}
+
+// Wrapper for authenticated fetch requests
+async function fetchWithAuth(url, options = {}) {
+    let token = localStorage.getItem('token');
+    
+    if (!token) {
+        window.location.href = 'signin.html';
+        throw new Error('No token found');
+    }
+    
+    let response = await fetch(url, {
+        ...options,
+        headers: {
+            ...options.headers,
+            'Authorization': `Bearer ${token}`
+        }
+    });
+    
+    if (response.status === 401) {
+        const refreshed = await refreshAccessToken();
+        
+        if (refreshed) {
+            token = localStorage.getItem('token');
+            response = await fetch(url, {
+                ...options,
+                headers: {
+                    ...options.headers,
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+        } else {
+            localStorage.clear();
+            window.location.href = 'signin.html';
+            throw new Error('Session expired. Please login again.');
+        }
+    }
+    
+    return response;
 }
 
 // Logout function
 function logout() {
     localStorage.removeItem('token');
+    localStorage.removeItem('refresh_token');
     localStorage.removeItem('user');
     localStorage.removeItem('role');
     window.location.href = 'signin.html';
 }
+
+// Make logout available globally (for onclick in HTML)
+window.logout = logout;
 
 // Run auth check on protected pages
 if (window.location.pathname.includes('dashboard')) {
@@ -118,3 +157,6 @@ if (window.location.pathname.includes('dashboard')) {
         window.location.href = 'signin.html';
     }
 }
+
+// Export for use in other modules
+export { fetchWithAuth, logout, refreshAccessToken };

@@ -1,4 +1,5 @@
 import { API_BASE_URL } from './config.js';
+import { fetchWithAuth } from './auth.js';
 
 let allMembers = [];
 let offerings = [];
@@ -33,12 +34,8 @@ function setupEventListeners() {
 }
 
 async function loadMembers() {
-    const token = localStorage.getItem('token');
-    
     try {
-        const response = await fetch(`${API_BASE_URL}/members/`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
+        const response = await fetchWithAuth(`${API_BASE_URL}/members/`);
         
         if (response.ok) {
             allMembers = await response.json();
@@ -49,12 +46,8 @@ async function loadMembers() {
 }
 
 async function loadOfferings() {
-    const token = localStorage.getItem('token');
-    
     try {
-        const response = await fetch(`${API_BASE_URL}/offerings`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
+        const response = await fetchWithAuth(`${API_BASE_URL}/offerings`);
         
         if (response.status === 401) {
             localStorage.clear();
@@ -79,12 +72,8 @@ async function loadOfferings() {
 }
 
 async function loadTodayTotal() {
-    const token = localStorage.getItem('token');
-    
     try {
-        const response = await fetch(`${API_BASE_URL}/offerings/today`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
+        const response = await fetchWithAuth(`${API_BASE_URL}/offerings/today`);
         
         if (response.ok) {
             const data = await response.json();
@@ -96,12 +85,8 @@ async function loadTodayTotal() {
 }
 
 async function loadMonthlyTotal() {
-    const token = localStorage.getItem('token');
-    
     try {
-        const response = await fetch(`${API_BASE_URL}/offerings/monthly`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
+        const response = await fetchWithAuth(`${API_BASE_URL}/offerings/monthly`);
         
         if (response.ok) {
             const data = await response.json();
@@ -120,12 +105,8 @@ async function filterByDateRange() {
         return;
     }
     
-    const token = localStorage.getItem('token');
-    
     try {
-        const response = await fetch(`${API_BASE_URL}/offerings/date-range?startDate=${startDate}&endDate=${endDate}`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
+        const response = await fetchWithAuth(`${API_BASE_URL}/offerings/date-range?startDate=${startDate}&endDate=${endDate}`);
         
         if (response.ok) {
             const filtered = await response.json();
@@ -206,19 +187,15 @@ async function recordOffering() {
         return;
     }
     
-    const token = localStorage.getItem('token');
     const submitBtn = document.querySelector('.submit-btn');
     const originalText = submitBtn.textContent;
     submitBtn.textContent = 'Recording...';
     submitBtn.disabled = true;
     
     try {
-        const response = await fetch(`${API_BASE_URL}/offerings`, {
+        const response = await fetchWithAuth(`${API_BASE_URL}/offerings`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 member_id: memberId,
                 offering_type: offeringType,

@@ -1,4 +1,5 @@
 import { API_BASE_URL } from './config.js';
+import { fetchWithAuth } from './auth.js';
 
 let allMembers = [];
 let currentMemberId = null;
@@ -23,11 +24,7 @@ async function loadMembers() {
     }
 
     try {
-        const response = await fetch(`${API_BASE_URL}/members/`, {
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        });
+        const response = await fetchWithAuth(`${API_BASE_URL}/members/`);
 
         if (response.status === 401) {
             localStorage.clear();
@@ -120,15 +117,10 @@ function filterMembers(searchTerm) {
 
 // View member details
 async function viewMember(id) {
-    const token = localStorage.getItem('token');
     currentMemberId = id;
     
     try {
-        const response = await fetch(`${API_BASE_URL}/members/${id}`, {
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
-        });
+        const response = await fetchWithAuth(`${API_BASE_URL}/members/${id}`);
         
         if (!response.ok) {
             throw new Error('Failed to load member details');
@@ -198,7 +190,6 @@ async function viewMember(id) {
 
 // Edit member (redirect to edit page)
 function editMember(id) {
-    // For now, redirect to edit page with ID
     window.location.href = `edit-member.html?id=${id}`;
 }
 
@@ -225,14 +216,9 @@ function deleteCurrentMember() {
 
 // Delete member
 async function deleteMember(id) {
-    const token = localStorage.getItem('token');
-    
     try {
-        const response = await fetch(`${API_BASE_URL}/members/delete/${id}`, {
-            method: 'DELETE',
-            headers: {
-                'Authorization': `Bearer ${token}`
-            }
+        const response = await fetchWithAuth(`${API_BASE_URL}/members/delete/${id}`, {
+            method: 'DELETE'
         });
         
         if (response.ok) {

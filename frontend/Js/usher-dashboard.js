@@ -1,4 +1,5 @@
 import { API_BASE_URL } from "./config.js";
+import { fetchWithAuth } from './auth.js';
 
 let searchTimeout = null;
 let currentPage = 1;
@@ -30,25 +31,11 @@ function setupEventListeners() {
     if (searchInput) {
         searchInput.addEventListener('input', handleSearch);
     }
-    
-    const logoutBtn = document.getElementById('logoutBtn');
-    if (logoutBtn) {
-        logoutBtn.addEventListener('click', () => {
-            localStorage.removeItem('token');
-            localStorage.removeItem('user');
-            localStorage.removeItem('role');
-            window.location.href = 'signin.html';
-        });
-    }
 }
 
 async function loadTotalMembersCount() {
-    const token = localStorage.getItem('token');
-    
     try {
-        const response = await fetch(`${API_BASE_URL}/members/count`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
+        const response = await fetchWithAuth(`${API_BASE_URL}/members/count`);
         
         if (response.ok) {
             const data = await response.json();
@@ -60,13 +47,10 @@ async function loadTotalMembersCount() {
 }
 
 async function loadMarkedToday(page) {
-    const token = localStorage.getItem('token');
     currentPage = page;
     
     try {
-        const response = await fetch(`${API_BASE_URL}/attendance/today?page=${page}&limit=${ITEMS_PER_PAGE}`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
+        const response = await fetchWithAuth(`${API_BASE_URL}/attendance/today?page=${page}&limit=${ITEMS_PER_PAGE}`);
         
         if (response.ok) {
             const data = await response.json();
@@ -153,12 +137,8 @@ async function performSearch(searchTerm) {
         return;
     }
     
-    const token = localStorage.getItem('token');
-    
     try {
-        const response = await fetch(`${API_BASE_URL}/members/search?q=${encodeURIComponent(searchTerm)}`, {
-            headers: { 'Authorization': `Bearer ${token}` }
-        });
+        const response = await fetchWithAuth(`${API_BASE_URL}/members/search?q=${encodeURIComponent(searchTerm)}`);
         
         if (response.ok) {
             const members = await response.json();
@@ -205,7 +185,6 @@ function displaySearchResults(members, searchTerm) {
 }
 
 async function markAttendance(memberId, firstName, lastName, phone) {
-    const token = localStorage.getItem('token');
     const markBtn = document.querySelector(`.mark-btn[data-member-id="${memberId}"]`);
     
     if (markBtn) {
@@ -214,12 +193,9 @@ async function markAttendance(memberId, firstName, lastName, phone) {
     }
     
     try {
-        const response = await fetch(`${API_BASE_URL}/attendance/mark`, {
+        const response = await fetchWithAuth(`${API_BASE_URL}/attendance/mark`, {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${token}`
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 member_id: memberId,
                 service_date: today
