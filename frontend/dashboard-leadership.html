@@ -94,6 +94,13 @@
             font-size: 0.9rem;
         }
 
+        .three-columns {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
         .two-columns {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -219,6 +226,54 @@
             color: var(--gray);
         }
 
+        /* Sunday Summary Styles */
+        .summary-field {
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .summary-field:last-child {
+            border-bottom: none;
+        }
+
+        .summary-label {
+            font-size: 0.7rem;
+            color: var(--gray);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .summary-value {
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: var(--dark);
+            margin-top: 0.2rem;
+        }
+
+        .summary-sermon {
+            background: #f0fdf4;
+            padding: 0.75rem;
+            border-radius: 10px;
+            margin-top: 0.5rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .summary-sermon-text {
+            font-family: monospace;
+            font-size: 0.9rem;
+            color: var(--primary);
+        }
+
+        .summary-highlights {
+            background: #fef3c7;
+            padding: 0.75rem;
+            border-radius: 10px;
+            margin-top: 0.5rem;
+            font-size: 0.85rem;
+            color: #92400e;
+        }
+
         .loading {
             text-align: center;
             padding: 2rem;
@@ -234,6 +289,9 @@
         @media (max-width: 1024px) {
             .stats-grid {
                 grid-template-columns: repeat(2, 1fr);
+            }
+            .three-columns {
+                grid-template-columns: 1fr;
             }
             .two-columns {
                 grid-template-columns: 1fr;
@@ -303,7 +361,7 @@
             </div>
         </div>
 
-        <div class="two-columns">
+        <div class="three-columns">
             <!-- Attendance Trend Chart -->
             <div class="card">
                 <div class="card-header">
@@ -321,6 +379,16 @@
                 </div>
                 <div id="offeringSummary">
                     <div class="loading">Loading offerings...</div>
+                </div>
+            </div>
+
+            <!-- Last Sunday Summary -->
+            <div class="card">
+                <div class="card-header">
+                    <h3>📖 Last Sunday Summary</h3>
+                </div>
+                <div id="sundaySummary">
+                    <div class="loading">Loading summary...</div>
                 </div>
             </div>
         </div>
@@ -348,7 +416,7 @@
         </div>
     </div>
 
-    <script type = module src="./js/auth.js"></script>
-    <script type = module src="./js/leadership-dashboard.js"></script>
+    <script type="module" src="./js/auth.js"></script>
+    <script type="module" src="./js/leadership-dashboard.js"></script>
 </body>
 </html>

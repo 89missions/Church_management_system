@@ -18,6 +18,7 @@ app.use('/api/members/', require('./routes/api/membersroute.js'))
 app.use('/api/offerings/', require('./routes/api/offeringsroute.js'))
 app.use('/api/events/', require('./routes/api/eventroute.js'))
 app.use('/api/push/', require('./routes/api/pushroute.js'))
+app.use('/api/sunday-summary/', require('./routes/api/sunday-summary.js'))
 
 // Saturday 6pm reminder cron job (runs every Saturday at 18:00)
 cron.schedule('0 18 * * 6', async () => {

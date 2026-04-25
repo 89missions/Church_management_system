@@ -125,6 +125,10 @@ function showEmptySummary() {
     `;
 }
 
+// Event listeners instead of inline onclick
+document.querySelector('.edit-summary-btn').addEventListener('click', openSummaryModal);
+document.querySelector('.cancel-btn').addEventListener('click', closeSummaryModal);
+
 // Open modal to edit summary
 function openSummaryModal() {
     const modal = document.getElementById('summaryModal');
@@ -136,7 +140,6 @@ function openSummaryModal() {
     document.getElementById('sermonTitle').value = existingSummary.sermon_title || '';
     document.getElementById('teachingText').value = existingSummary.teaching_text || '';
     document.getElementById('offeringTotal').value = existingSummary.offering_total || '';
-    document.getElementById('attendanceCount').value = existingSummary.attendance_count || '';
     document.getElementById('highlights').value = existingSummary.highlights || '';
 }
 
@@ -157,7 +160,6 @@ document.getElementById('summaryForm')?.addEventListener('submit', async (e) => 
         sermon_title: document.getElementById('sermonTitle').value,
         teaching_text: document.getElementById('teachingText').value,
         offering_total: parseFloat(document.getElementById('offeringTotal').value) || 0,
-        attendance_count: parseInt(document.getElementById('attendanceCount').value) || 0,
         highlights: document.getElementById('highlights').value,
         summary_date: getLastSunday(new Date()).toISOString().split('T')[0]
     };
@@ -280,5 +282,10 @@ logoutbtn.addEventListener('click',()=>{
     localStorage.removeItem('role');
     window.location.href = 'signin.html';
 })
+
+// Make functions available to inline onclick handlers
+window.openSummaryModal = openSummaryModal;
+window.closeSummaryModal = closeSummaryModal;
+
 // Load dashboard on page load
 document.addEventListener('DOMContentLoaded', loadDashboardData);

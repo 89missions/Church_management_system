@@ -27,7 +27,8 @@ async function loadDashboardData() {
             loadAttendanceTrend(),
             loadOfferingSummary(),
             loadMemberBreakdown(),
-            loadUpcomingEvents()
+            loadUpcomingEvents(),
+            loadSundaySummary()
         ]);
         
         updateLastUpdated();
@@ -82,7 +83,6 @@ function renderAttendanceChart(data) {
         return;
     }
     
-    // Find max attendance for scaling
     const maxAttendance = Math.max(...data.map(d => d.count), 1);
     
     container.innerHTML = `
@@ -215,8 +215,78 @@ function renderUpcomingEvents(events) {
     `).join('');
 }
 
+async function loadSundaySummary() {
+    const token = localStorage.getItem('token');
+    
+    try {
+        const response = await fetch(`${API_BASE_URL}/sunday-summary/latest`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (response.ok) {
+            const summary = await response.json();
+            displaySundaySummary(summary);
+        } else if (response.status === 404) {
+            document.getElementById('sundaySummary').innerHTML = `
+                <div style="text-align: center; padding: 1rem; color: var(--gray);">
+                    📭 No Sunday summary available yet
+                </div>
+            `;
+        }
+    } catch (error) {
+        console.error('Error loading Sunday summary:', error);
+        document.getElementById('sundaySummary').innerHTML = `
+            <div style="text-align: center; padding: 1rem; color: var(--gray);">
+                ❌ Failed to load summary
+            </div>
+        `;
+    }
+}
+
+function displaySundaySummary(summary) {
+    const container = document.getElementById('sundaySummary');
+    
+    container.innerHTML = `
+        <div class="summary-field">
+            <div class="summary-label">📅 Date</div>
+            <div class="summary-value">${formatDate(summary.summary_date)}</div>
+        </div>
+        <div class="summary-sermon">
+            <div class="summary-label">📖 Sermon Text</div>
+            <div class="summary-sermon-text">${escapeHtml(summary.sermon_text || 'Not recorded')}</div>
+        </div>
+        <div class="summary-field">
+            <div class="summary-label">🎯 Sermon Title</div>
+            <div class="summary-value">${escapeHtml(summary.sermon_title || 'Not recorded')}</div>
+        </div>
+        <div class="summary-field">
+            <div class="summary-label">📚 Teaching Text</div>
+            <div class="summary-value">${escapeHtml(summary.teaching_text || 'Not recorded')}</div>
+        </div>
+        <div class="summary-field">
+            <div class="summary-label">💰 Offering Total</div>
+            <div class="summary-value">${formatCurrency(summary.offering_total || 0)}</div>
+        </div>
+        <div class="summary-field">
+            <div class="summary-label">👥 Attendance</div>
+            <div class="summary-value">${summary.attendance_count || 0} people</div>
+        </div>
+        ${summary.highlights ? `
+            <div class="summary-highlights">
+                <div class="summary-label">📝 Highlights</div>
+                <div>${escapeHtml(summary.highlights)}</div>
+            </div>
+        ` : ''}
+    `;
+}
+
+function formatDate(dateString) {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+}
+
 async function refreshDashboard() {
-    // Show refreshing indicator
     const refreshBtn = document.querySelector('.refresh-btn');
     const originalText = refreshBtn.textContent;
     refreshBtn.textContent = 'Refreshing...';
@@ -255,7 +325,6 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
-// Cleanup interval on page unload
 window.addEventListener('beforeunload', () => {
     if (refreshInterval) {
         clearInterval(refreshInterval);

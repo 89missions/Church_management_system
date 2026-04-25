@@ -3,7 +3,7 @@ const { getEvents, getEventsById, addEvents, editEvent, deleteEvent } = require(
 const router = express.Router()
 
 router.post('/', addEvents)
-router.get('/', getEvents)
+router.get('/upcoming', getEvents)
 router.get('/:id', getEventsById)
 router.put('/:id', editEvent)      
 router.delete('/:id', deleteEvent) 
