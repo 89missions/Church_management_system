@@ -247,10 +247,54 @@ const deleteMembers = async (req, res) => {
     }
 };
 
+// Search members by name or phone
+const searchMembers = async (req, res) => {
+    try {
+        const { q } = req.query;
+        
+        if (!q || q.length < 2) {
+            return res.status(400).json({ message: "Search term must be at least 2 characters" });
+        }
+        
+        const query = `
+            SELECT id, first_name, last_name, email, phone 
+            FROM members 
+            WHERE status = 'Active' 
+            AND (first_name ILIKE $1 OR last_name ILIKE $1 OR phone ILIKE $1)
+            ORDER BY first_name ASC
+            LIMIT 20
+        `;
+        
+        const result = await pool.query(query, [`%${q}%`]);
+        
+        return res.status(200).json(result.rows);
+        
+    } catch (error) {
+        console.error('Error searching members:', error);
+        return res.status(500).json({ message: "Internal server error" });
+    }
+};
+
+// Get total members count
+const getMembersCount = async (req, res) => {
+    try {
+        const query = `SELECT COUNT(*) as count FROM members WHERE status = 'Active'`;
+        const result = await pool.query(query);
+        
+        return res.status(200).json({ count: parseInt(result.rows[0].count) });
+        
+    } catch (error) {
+        console.error('Error getting members count:', error);
+        return res.status(500).json({ message: "Internal server error" });
+    }
+};
+
 module.exports={
     getMembers,
     getMembersWithId,
     postMembers,
     updateMembers,
-    deleteMembers
+    deleteMembers,
+    searchMembers,
+    getMembersCount
 }

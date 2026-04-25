@@ -58,7 +58,7 @@
 
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(2, 1fr);
             gap: 1.5rem;
             margin-bottom: 2rem;
         }
@@ -74,18 +74,7 @@
         .stat-number {
             font-size: 2.5rem;
             font-weight: bold;
-        }
-
-        .stat-number.present {
             color: #10b981;
-        }
-
-        .stat-number.absent {
-            color: #ef4444;
-        }
-
-        .stat-number.pending {
-            color: #f59e0b;
         }
 
         .stat-label {
@@ -93,17 +82,12 @@
             margin-top: 0.5rem;
         }
 
-        .two-columns {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1.5rem;
-        }
-
-        .card {
+        .search-card, .marked-card {
             background: white;
             border-radius: 20px;
             padding: 1.5rem;
             box-shadow: var(--shadow);
+            margin-bottom: 1.5rem;
         }
 
         .card-header {
@@ -155,35 +139,27 @@
             color: var(--gray);
         }
 
-        .action-buttons {
-            display: flex;
-            gap: 0.5rem;
-        }
-
-        .present-btn, .absent-btn {
-            padding: 0.4rem 0.8rem;
+        .mark-btn {
+            background: #10b981;
+            color: white;
             border: none;
+            padding: 0.4rem 1rem;
             border-radius: 8px;
             cursor: pointer;
             font-size: 0.8rem;
         }
 
-        .present-btn {
-            background: #10b981;
-            color: white;
+        .mark-btn:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
         }
 
-        .absent-btn {
-            background: #ef4444;
-            color: white;
-        }
-
-        .pending-list {
+        .marked-list {
             max-height: 400px;
             overflow-y: auto;
         }
 
-        .pending-item {
+        .marked-item {
             display: flex;
             justify-content: space-between;
             align-items: center;
@@ -191,52 +167,59 @@
             border-bottom: 1px solid #e5e7eb;
         }
 
-        .pending-status {
-            padding: 0.2rem 0.6rem;
-            border-radius: 20px;
+        .marked-time {
             font-size: 0.7rem;
-        }
-
-        .status-present {
-            background: #d1fae5;
-            color: #065f46;
-        }
-
-        .status-absent {
-            background: #fee2e2;
-            color: #dc2626;
-        }
-
-        .remove-btn {
-            background: none;
-            border: none;
-            font-size: 1.2rem;
-            cursor: pointer;
             color: var(--gray);
         }
 
-        .save-all-btn {
-            background: var(--primary);
-            color: white;
-            width: 100%;
-            padding: 1rem;
-            border: none;
-            border-radius: 10px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            margin-top: 1rem;
+        .empty-state {
+            text-align: center;
+            padding: 2rem;
+            color: var(--gray);
         }
 
-        .save-all-btn:disabled {
-            background: #9ca3af;
+        .pagination {
+            display: flex;
+            justify-content: center;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .page-btn {
+            padding: 0.3rem 0.7rem;
+            border: 1px solid #e5e7eb;
+            background: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .page-btn.active {
+            background: var(--primary);
+            color: white;
+            border-color: var(--primary);
+        }
+
+        .page-btn:disabled {
+            opacity: 0.5;
             cursor: not-allowed;
         }
 
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: var(--gray);
+        }
+
         .alert {
-            padding: 0.8rem;
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 0.8rem 1.2rem;
             border-radius: 10px;
-            margin-bottom: 1rem;
+            z-index: 1000;
+            animation: slideIn 0.3s ease;
         }
 
         .alert-success {
@@ -249,24 +232,20 @@
             color: #dc2626;
         }
 
-        .loading {
-            text-align: center;
-            padding: 2rem;
-            color: var(--gray);
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 2rem;
-            color: var(--gray);
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
         }
 
         @media (max-width: 768px) {
             .dashboard-container {
                 padding: 0 1rem;
-            }
-            .two-columns {
-                grid-template-columns: 1fr;
             }
             .stats-grid {
                 grid-template-columns: 1fr;
@@ -283,52 +262,46 @@
                 <p>Welcome back, <span id="usherName">Loading...</span></p>
                 <div class="service-date" id="serviceDate"></div>
             </div>
-            <button class="logout-btn">🚪 Logout</button>
+            <button class="logout-btn" id="logoutBtn">🚪 Logout</button>
         </div>
 
         <!-- Stats -->
         <div class="stats-grid">
             <div class="stat-card">
-                <div class="stat-number present" id="presentCount">0</div>
-                <div class="stat-label">✅ Present</div>
+                <div class="stat-number" id="presentCount">0</div>
+                <div class="stat-label">✅ Present Today</div>
             </div>
             <div class="stat-card">
-                <div class="stat-number absent" id="absentCount">0</div>
-                <div class="stat-label">❌ Absent</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number pending" id="pendingCount">0</div>
-                <div class="stat-label">⏳ Pending</div>
+                <div class="stat-number" id="totalMembers">0</div>
+                <div class="stat-label">👥 Total Members</div>
             </div>
         </div>
 
-        <div class="two-columns">
-            <!-- Left Column: Search & Mark -->
-            <div class="card">
-                <div class="card-header">
-                    <h3>🔍 Mark Attendance</h3>
-                </div>
-                <input type="text" id="searchInput" class="search-box" placeholder="Search by name or phone...">
-                <div id="searchResults" class="search-results">
-                    <div class="empty-state">Start typing to search members...</div>
-                </div>
+        <!-- Search Card -->
+        <div class="search-card">
+            <div class="card-header">
+                <h3>🔍 Mark Attendance</h3>
             </div>
+            <input type="text" id="searchInput" class="search-box" placeholder="Search by name or phone...">
+            <div id="searchResults" class="search-results">
+                <div class="empty-state">Start typing to search members...</div>
+            </div>
+        </div>
 
-            <!-- Right Column: Pending List -->
-            <div class="card">
-                <div class="card-header">
-                    <h3>📋 Pending List</h3>
-                    <span id="pendingListCount" style="background: #e5e7eb; padding: 0.2rem 0.6rem; border-radius: 20px; font-size: 0.8rem;">0</span>
-                </div>
-                <div id="pendingList" class="pending-list">
-                    <div class="empty-state">No members marked yet</div>
-                </div>
-                <button id="saveAllBtn" class="save-all-btn" onclick="saveAllAttendance()">💾 Save All Attendance</button>
+        <!-- Marked Today Card with Pagination -->
+        <div class="marked-card">
+            <div class="card-header">
+                <h3>📋 Marked Today</h3>
+                <span id="totalMarkedBadge" style="background: #e5e7eb; padding: 0.2rem 0.6rem; border-radius: 20px; font-size: 0.8rem;">0</span>
             </div>
+            <div id="markedList" class="marked-list">
+                <div class="loading">Loading marked members...</div>
+            </div>
+            <div id="pagination" class="pagination"></div>
         </div>
     </div>
 
-    <div id="alertMessage" style="position: fixed; bottom: 20px; right: 20px; z-index: 1000;"></div>
+    <div id="alertMessage"></div>
 
     <script type="module" src="./js/auth.js"></script>
     <script type="module" src="./js/usher-dashboard.js"></script>

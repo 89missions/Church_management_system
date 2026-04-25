@@ -1,10 +1,10 @@
 import { API_BASE_URL } from "./config.js";
 
-let allMembers = [];
-let pendingAttendance = []; // { member_id, first_name, last_name, phone, attended }
 let searchTimeout = null;
+let currentPage = 1;
+let totalMarkedPages = 1;
+const ITEMS_PER_PAGE = 20;
 
-// Get today's date
 const today = new Date().toISOString().split('T')[0];
 
 document.addEventListener('DOMContentLoaded', async () => {
@@ -16,70 +16,122 @@ document.addEventListener('DOMContentLoaded', async () => {
         return;
     }
     
-    // Set service date
     document.getElementById('serviceDate').textContent = `Sunday, ${formatDateLong(today)}`;
-    
-    // Display usher name
     document.getElementById('usherName').textContent = user.name || 'Usher';
     
-    // Load all members for searching
-    await loadAllMembers();
+    await loadTotalMembersCount();
+    await loadMarkedToday(1);
     
-    // Load any existing attendance for today (if already saved)
-    await loadExistingAttendance();
-    
-    // Setup search listener
-    const searchInput = document.getElementById('searchInput');
-    searchInput.addEventListener('input', handleSearch);
+    setupEventListeners();
 });
 
-async function loadAllMembers() {
-    const token = localStorage.getItem('token');
+function setupEventListeners() {
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput) {
+        searchInput.addEventListener('input', handleSearch);
+    }
     
-    try {
-        const response = await fetch(`${API_BASE_URL}/members`, {
-            headers: { 'Authorization': `Bearer ${token}` }
+    const logoutBtn = document.getElementById('logoutBtn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', () => {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            localStorage.removeItem('role');
+            window.location.href = 'signin.html';
         });
-        
-        if (response.ok) {
-            allMembers = await response.json();
-        }
-    } catch (error) {
-        console.error('Error loading members:', error);
     }
 }
 
-async function loadExistingAttendance() {
+async function loadTotalMembersCount() {
     const token = localStorage.getItem('token');
     
     try {
-        const response = await fetch(`${API_BASE_URL}/attendance/today?service_type=Sunday`, {
+        const response = await fetch(`${API_BASE_URL}/members/count`, {
             headers: { 'Authorization': `Bearer ${token}` }
         });
         
         if (response.ok) {
-            const existing = await response.json();
-            
-            // Convert existing attendance to pending format
-            existing.forEach(record => {
-                if (!pendingAttendance.find(p => p.member_id === record.member_id)) {
-                    pendingAttendance.push({
-                        member_id: record.member_id,
-                        first_name: record.first_name,
-                        last_name: record.last_name,
-                        phone: record.phone,
-                        attended: record.attended
-                    });
-                }
-            });
-            
-            renderPendingList();
-            updateStats();
+            const data = await response.json();
+            document.getElementById('totalMembers').textContent = data.count || 0;
         }
     } catch (error) {
-        console.error('Error loading existing attendance:', error);
+        console.error('Error loading total members:', error);
     }
 }
+
+async function loadMarkedToday(page) {
+    const token = localStorage.getItem('token');
+    currentPage = page;
+    
+    try {
+        const response = await fetch(`${API_BASE_URL}/attendance/today?page=${page}&limit=${ITEMS_PER_PAGE}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            renderMarkedList(data.records);
+            renderPagination(data.total, data.page, data.totalPages);
+            document.getElementById('presentCount').textContent = data.total;
+            document.getElementById('totalMarkedBadge').textContent = data.total;
+        }
+    } catch (error) {
+        console.error('Error loading marked today:', error);
+        document.getElementById('markedList').innerHTML = '<div class="empty-state">Failed to load marked members</div>';
+    }
+}
+
+function renderMarkedList(records) {
+    const container = document.getElementById('markedList');
+    
+    if (!records || records.length === 0) {
+        container.innerHTML = '<div class="empty-state">No members marked today yet</div>';
+        return;
+    }
+    
+    container.innerHTML = records.map(record => `
+        <div class="marked-item">
+            <div>
+                <div class="member-name">${record.first_name} ${record.last_name}</div>
+                <div class="member-phone">${record.phone}</div>
+            </div>
+            <div class="marked-time">${formatTime(record.marked_at)}</div>
+        </div>
+    `).join('');
+}
+
+function renderPagination(total, currentPage, totalPages) {
+    const container = document.getElementById('pagination');
+    
+    if (totalPages <= 1) {
+        container.innerHTML = '';
+        return;
+    }
+    
+    let buttons = '';
+    
+    // Previous button
+    buttons += `<button class="page-btn" onclick="goToPage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>← Prev</button>`;
+    
+    // Page numbers
+    for (let i = 1; i <= totalPages; i++) {
+        if (i === 1 || i === totalPages || (i >= currentPage - 2 && i <= currentPage + 2)) {
+            buttons += `<button class="page-btn ${i === currentPage ? 'active' : ''}" onclick="goToPage(${i})">${i}</button>`;
+        } else if (i === currentPage - 3 || i === currentPage + 3) {
+            buttons += `<span style="padding: 0.3rem 0.5rem;">...</span>`;
+        }
+    }
+    
+    // Next button
+    buttons += `<button class="page-btn" onclick="goToPage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>Next →</button>`;
+    
+    container.innerHTML = buttons;
+}
+
+window.goToPage = function(page) {
+    if (page < 1) return;
+    loadMarkedToday(page);
+};
 
 function handleSearch(e) {
     const searchTerm = e.target.value.toLowerCase();
@@ -93,7 +145,7 @@ function handleSearch(e) {
     }, 300);
 }
 
-function performSearch(searchTerm) {
+async function performSearch(searchTerm) {
     const resultsDiv = document.getElementById('searchResults');
     
     if (searchTerm.length < 2) {
@@ -101,176 +153,115 @@ function performSearch(searchTerm) {
         return;
     }
     
-    const filtered = allMembers.filter(member => {
-        const fullName = `${member.first_name} ${member.last_name}`.toLowerCase();
-        const phone = member.phone;
-        return fullName.includes(searchTerm) || phone.includes(searchTerm);
-    }).slice(0, 10);
-    
-    if (filtered.length === 0) {
-        resultsDiv.innerHTML = '<div class="empty-state">No members found</div>';
-        return;
-    }
-    
-    resultsDiv.innerHTML = filtered.map(member => {
-        const alreadyMarked = pendingAttendance.find(p => p.member_id === member.id);
-        return `
-            <div class="search-result-item">
-                <div class="member-info">
-                    <div class="member-name">${member.first_name} ${member.last_name}</div>
-                    <div class="member-phone">${member.phone}</div>
-                </div>
-                <div class="action-buttons">
-                    <button class="present-btn" onclick="markAttendance('${member.id}', '${member.first_name}', '${member.last_name}', '${member.phone}', true)" ${alreadyMarked ? 'disabled' : ''}>
-                        ✅ Present
-                    </button>
-                    <button class="absent-btn" onclick="markAttendance('${member.id}', '${member.first_name}', '${member.last_name}', '${member.phone}', false)" ${alreadyMarked ? 'disabled' : ''}>
-                        ❌ Absent
-                    </button>
-                </div>
-            </div>
-        `;
-    }).join('');
-}
-
-function markAttendance(memberId, firstName, lastName, phone, attended) {
-    // Check if already marked
-    const alreadyMarked = pendingAttendance.find(p => p.member_id === memberId);
-    if (alreadyMarked) {
-        showAlert(`${firstName} ${lastName} is already marked`, 'error');
-        return;
-    }
-    
-    // Add to pending list
-    pendingAttendance.push({
-        member_id: memberId,
-        first_name: firstName,
-        last_name: lastName,
-        phone: phone,
-        attended: attended
-    });
-    
-    // Clear search input and results
-    document.getElementById('searchInput').value = '';
-    document.getElementById('searchResults').innerHTML = '<div class="empty-state">Start typing to search members...</div>';
-    
-    // Update UI
-    renderPendingList();
-    updateStats();
-    
-    showAlert(`${firstName} ${lastName} marked as ${attended ? 'Present' : 'Absent'}`, 'success');
-}
-
-function removeFromPending(memberId, firstName, lastName) {
-    pendingAttendance = pendingAttendance.filter(p => p.member_id !== memberId);
-    renderPendingList();
-    updateStats();
-    showAlert(`${firstName} ${lastName} removed from list`, 'success');
-}
-
-function updateAttendanceStatus(memberId, attended) {
-    const member = pendingAttendance.find(p => p.member_id === memberId);
-    if (member) {
-        member.attended = attended;
-        renderPendingList();
-        updateStats();
-    }
-}
-
-function renderPendingList() {
-    const container = document.getElementById('pendingList');
-    const countSpan = document.getElementById('pendingListCount');
-    
-    countSpan.textContent = pendingAttendance.length;
-    
-    if (pendingAttendance.length === 0) {
-        container.innerHTML = '<div class="empty-state">No members marked yet</div>';
-        return;
-    }
-    
-    container.innerHTML = pendingAttendance.map(member => `
-        <div class="pending-item">
-            <div>
-                <strong>${member.first_name} ${member.last_name}</strong>
-                <div style="font-size: 0.8rem; color: var(--gray);">${member.phone}</div>
-            </div>
-            <div style="display: flex; align-items: center; gap: 0.5rem;">
-                <select onchange="updateAttendanceStatus('${member.member_id}', this.value === 'true')" style="padding: 0.3rem; border-radius: 6px;">
-                    <option value="true" ${member.attended ? 'selected' : ''}>✅ Present</option>
-                    <option value="false" ${!member.attended ? 'selected' : ''}>❌ Absent</option>
-                </select>
-                <button class="remove-btn" onclick="removeFromPending('${member.member_id}', '${member.first_name}', '${member.last_name}')">✖</button>
-            </div>
-        </div>
-    `).join('');
-}
-
-function updateStats() {
-    const present = pendingAttendance.filter(m => m.attended === true).length;
-    const absent = pendingAttendance.filter(m => m.attended === false).length;
-    const pending = pendingAttendance.length;
-    
-    document.getElementById('presentCount').textContent = present;
-    document.getElementById('absentCount').textContent = absent;
-    document.getElementById('pendingCount').textContent = pending;
-}
-
-async function saveAllAttendance() {
-    if (pendingAttendance.length === 0) {
-        showAlert('No attendance records to save', 'error');
-        return;
-    }
-    
     const token = localStorage.getItem('token');
-    const saveBtn = document.getElementById('saveAllBtn');
-    const originalText = saveBtn.textContent;
-    saveBtn.textContent = 'Saving...';
-    saveBtn.disabled = true;
-    
-    const records = pendingAttendance.map(member => ({
-        member_id: member.member_id,
-        attended: member.attended
-    }));
     
     try {
-        const response = await fetch(`${API_BASE_URL}/attendance/batch`, {
+        const response = await fetch(`${API_BASE_URL}/members/search?q=${encodeURIComponent(searchTerm)}`, {
+            headers: { 'Authorization': `Bearer ${token}` }
+        });
+        
+        if (response.ok) {
+            const members = await response.json();
+            displaySearchResults(members, searchTerm);
+        }
+    } catch (error) {
+        console.error('Error searching members:', error);
+        resultsDiv.innerHTML = '<div class="empty-state">Search failed. Try again.</div>';
+    }
+}
+
+function displaySearchResults(members, searchTerm) {
+    const resultsDiv = document.getElementById('searchResults');
+    
+    if (members.length === 0) {
+        resultsDiv.innerHTML = '<div class="empty-state">No members found matching your search</div>';
+        return;
+    }
+    
+    resultsDiv.innerHTML = members.map(member => `
+        <div class="search-result-item" data-member-id="${member.id}">
+            <div class="member-info">
+                <div class="member-name">${member.first_name} ${member.last_name}</div>
+                <div class="member-phone">${member.phone}</div>
+            </div>
+            <button class="mark-btn" data-member-id="${member.id}" data-first-name="${member.first_name}" data-last-name="${member.last_name}" data-phone="${member.phone}">
+                ✅ Mark Present
+            </button>
+        </div>
+    `).join('');
+    
+    // Attach event listeners to mark buttons
+    const markButtons = document.querySelectorAll('.mark-btn');
+    markButtons.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const memberId = btn.dataset.memberId;
+            const firstName = btn.dataset.firstName;
+            const lastName = btn.dataset.lastName;
+            const phone = btn.dataset.phone;
+            markAttendance(memberId, firstName, lastName, phone);
+        });
+    });
+}
+
+async function markAttendance(memberId, firstName, lastName, phone) {
+    const token = localStorage.getItem('token');
+    const markBtn = document.querySelector(`.mark-btn[data-member-id="${memberId}"]`);
+    
+    if (markBtn) {
+        markBtn.disabled = true;
+        markBtn.textContent = 'Marking...';
+    }
+    
+    try {
+        const response = await fetch(`${API_BASE_URL}/attendance/mark`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${token}`
             },
             body: JSON.stringify({
-                service_date: today,
-                service_type: 'Sunday',
-                records: records
+                member_id: memberId,
+                service_date: today
             })
         });
         
         if (response.ok) {
-            showAlert(`Successfully saved ${pendingAttendance.length} attendance records!`, 'success');
-            pendingAttendance = [];
-            renderPendingList();
-            updateStats();
+            showAlert(`${firstName} ${lastName} marked as present!`, 'success');
             
-            // Clear search input and results
+            // Clear search
             document.getElementById('searchInput').value = '';
             document.getElementById('searchResults').innerHTML = '<div class="empty-state">Start typing to search members...</div>';
+            
+            // Reload marked list
+            await loadMarkedToday(1);
         } else {
             const error = await response.json();
-            showAlert(error.message || 'Failed to save attendance', 'error');
+            showAlert(error.message || 'Failed to mark attendance', 'error');
+            if (markBtn) {
+                markBtn.disabled = false;
+                markBtn.textContent = '✅ Mark Present';
+            }
         }
     } catch (error) {
-        console.error('Error saving attendance:', error);
-        showAlert('Failed to save attendance. Check your connection.', 'error');
-    } finally {
-        saveBtn.textContent = originalText;
-        saveBtn.disabled = false;
+        console.error('Error marking attendance:', error);
+        showAlert('Failed to mark attendance. Check your connection.', 'error');
+        if (markBtn) {
+            markBtn.disabled = false;
+            markBtn.textContent = '✅ Mark Present';
+        }
     }
 }
 
 function formatDateLong(dateString) {
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+}
+
+function formatTime(dateString) {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    return date.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true });
 }
 
 function showAlert(message, type) {
@@ -280,12 +271,3 @@ function showAlert(message, type) {
         alertDiv.innerHTML = '';
     }, 3000);
 }
-
-const logoutbtn = document.querySelector('.logout-btn')
-
-logoutbtn.addEventListener('click',()=>{
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
-    localStorage.removeItem('role');
-    window.location.href = 'signin.html';
-})
