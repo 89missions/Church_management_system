@@ -110,6 +110,7 @@ async function fetchWithAuth(url, options = {}) {
     
     let response = await fetch(url, {
         ...options,
+        cache: 'no-store',
         headers: {
             ...options.headers,
             'Authorization': `Bearer ${token}`

@@ -63,7 +63,7 @@ window.addEventListener('appinstalled', () => {
 // Service Worker Registration
 if ('serviceWorker' in navigator) {
     window.addEventListener('load', () => {
-        navigator.serviceWorker.register('./sw.js')
+        navigator.serviceWorker.register('/frontend/sw.js')
             .then(registration => {
                 console.log('ServiceWorker registered: ', registration);
             })

@@ -199,7 +199,7 @@ function renderUpcomingEvents(events) {
 
 async function loadSundaySummary() {
     try {
-        const response = await fetchWithAuth(`${API_BASE_URL}/sunday-summary/latest`);
+        const response = await fetchWithAuth(`${API_BASE_URL}/sunday-summary`);
         
         if (response.ok) {
             const summary = await response.json();

@@ -44,25 +44,21 @@ async function loadStats() {
 // Load Sunday summary
 async function loadSundaySummary() {
     const summaryDate = document.getElementById('summaryDate');
-    const summaryContent = document.getElementById('summaryContent');
     
-    // Set current date
     const today = new Date();
     const lastSunday = getLastSunday(today);
     summaryDate.textContent = formatDateForDisplay(lastSunday);
     
     try {
-        const response = await fetchWithAuth(`${API_BASE_URL}/sunday-summary/latest`);
+        const response = await fetchWithAuth(`${API_BASE_URL}/sunday-summary`);
         
         if (response.ok) {
             const summary = await response.json();
             displaySummary(summary);
         } else {
-            // No summary yet
             showEmptySummary();
         }
     } catch (error) {
-        // Demo/empty state
         showEmptySummary();
     }
 }

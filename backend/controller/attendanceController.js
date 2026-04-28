@@ -88,7 +88,51 @@ const getTodayAttendance = async (req, res) => {
     }
 };
 
+// GET /attendance/member/:memberId
+const getMemberAttendance = async (req, res) => {
+    try {
+        const { memberId } = req.params;
+        const result = await pool.query(
+            'SELECT * FROM attendance WHERE member_id = $1 ORDER BY service_date DESC',
+            [memberId]
+        );
+        return res.status(200).json(result.rows);
+    } catch (error) {
+        console.error('Error fetching attendance:', error);
+        return res.status(500).json({ message: 'Internal server error' });
+    }
+};
+
+// GET /attendance/streak/:memberId
+const getMemberStreak = async (req, res) => {
+    try {
+        const { memberId } = req.params;
+        const result = await pool.query(
+            `SELECT service_date, attended FROM attendance 
+             WHERE member_id = $1 
+             ORDER BY service_date DESC`,
+            [memberId]
+        );
+
+        let streak = 0;
+        for (const record of result.rows) {
+            if (record.attended) {
+                streak++;
+            } else {
+                break;
+            }
+        }
+
+        return res.status(200).json({ streak });
+    } catch (error) {
+        console.error('Error fetching streak:', error);
+        return res.status(500).json({ message: 'Internal server error' });
+    }
+};
+
 module.exports = {
     getTodayAttendance,
-    markAttendance 
+    markAttendance,
+    getMemberAttendance,
+    getMemberStreak
 };

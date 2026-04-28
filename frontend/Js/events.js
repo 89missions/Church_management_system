@@ -17,7 +17,7 @@ async function loadEvents() {
     }
 
     try {
-        const response = await fetchWithAuth(`${API_BASE_URL}/events`);
+        const response = await fetchWithAuth(`${API_BASE_URL}/events/upcoming`);
 
         if (response.status === 401) {
             localStorage.clear();
@@ -260,3 +260,8 @@ window.onclick = function(event) {
     if (event.target === eventModal) closeEventModal();
     if (event.target === rsvpModal) closeRsvpModal();
 }
+window.openEventModal = openEventModal;
+window.closeEventModal = closeEventModal;
+window.deleteEvent = deleteEvent;
+window.viewRsvp = viewRsvp;
+window.closeRsvpModal = closeRsvpModal;

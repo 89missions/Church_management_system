@@ -51,11 +51,21 @@ const addEvents = async (req, res) => {
     }
 };
 
-const getEvents = async (req, res) => {
+const getUpcomingEvents = async (req, res) => {
     try {
-        const query = await pool.query(`SELECT * FROM events ORDER BY event_date DESC`);
-        return res.status(200).json(query.rows);
+        const limit = parseInt(req.query.limit) || 5;
+        const today = new Date().toISOString().split('T')[0];
 
+        const result = await pool.query(
+            `SELECT * FROM events 
+             WHERE event_date >= $1 
+             AND status != 'Cancelled'
+             ORDER BY event_date ASC
+             LIMIT $2`,
+            [today, limit]
+        );
+
+        return res.status(200).json(result.rows);
     } catch (error) {
         console.error(error);
         return res.status(500).json({ message: "Internal server error" });
@@ -191,7 +201,7 @@ const deleteEvent = async (req, res) => {
 
 module.exports = {
     addEvents,
-    getEvents,
+    getUpcomingEvents,
     getEventsById,
     editEvent,
     deleteEvent

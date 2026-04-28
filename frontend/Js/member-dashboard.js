@@ -75,7 +75,7 @@ function displayProfile(member) {
 
 async function loadUpcomingEvents() {
     try {
-        const response = await fetchWithAuth(`${API_BASE_URL}/events`);
+        const response = await fetchWithAuth(`${API_BASE_URL}/events/upcoming`);
         
         if (response.ok) {
             const allEvents = await response.json();
@@ -186,7 +186,7 @@ async function loadStreak() {
 
 async function loadSundaySummary() {
     try {
-        const response = await fetchWithAuth(`${API_BASE_URL}/sunday-summary/latest`);
+        const response = await fetchWithAuth(`${API_BASE_URL}/sunday-summary`);
         
         if (response.ok) {
             const summary = await response.json();
