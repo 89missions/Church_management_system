@@ -1,3 +1,4 @@
+require('dotenv').config()
 const pool = require('../config/dbConfig')
 const bcrypt = require('bcryptjs')
 
@@ -22,7 +23,7 @@ const getMembersWithId= async (req,res)=>{
             return res.status(400).json({"message":"Missing or invalid Id..."})
         }
         //quering the db..
-        const getmemberwithid = await pool.query('SELECT id, first_name, last_name, email, phone, address FROM members where id = $1',[id])
+        const getmemberwithid = await pool.query('SELECT id, first_name, last_name, email, phone, date_of_birth, gender,  address, marital_status, occupation, emergency_contact_name, emergency_contact_phone,joined_date  FROM members where id = $1',[id])
 
         //if member doesnt exist
         if (getmemberwithid.rows.length === 0) {
@@ -51,13 +52,11 @@ const postMembers = async (req, res) => {
             occupation,
             emergency_contact_name,
             emergency_contact_phone,
-            joined_date,
-            status,
             positions
         } = req.body;
 
-        const defaultpassword = 'WCO@1234'
-        // Validation to ensure backend receives all inputs
+        const defaultpassword = process.env.DEFAULT_PASSWORD
+        // Validation to ensure backend receives all valuable inputs
         if (!first_name || !last_name || !phone) {
             return res.status(400).json({ 
                 message: "First name, last name, and phone are required" 
@@ -71,13 +70,11 @@ const postMembers = async (req, res) => {
         const addMember = await pool.query(
             `INSERT INTO members (
                 first_name, last_name, email, phone, date_of_birth, gender, address,
-                marital_status, occupation, emergency_contact_name, emergency_contact_phone,
-                joined_date, status, password_hash, positions
-            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15)`,
+                marital_status, occupation, emergency_contact_name, emergency_contact_phone, password_hash, positions
+            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)`,
             [
                 first_name, last_name, email, phone, date_of_birth, gender, address,
-                marital_status, occupation, emergency_contact_name, emergency_contact_phone,
-                joined_date, status,hashed_password, positions
+                marital_status, occupation, emergency_contact_name, emergency_contact_phone,hashed_password, positions
             ]
         );
 

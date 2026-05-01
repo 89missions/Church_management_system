@@ -4,17 +4,14 @@ import { fetchWithAuth } from './auth.js';
 let allMembers = [];
 let currentMemberId = null;
 
-// Load all members on page load
 document.addEventListener('DOMContentLoaded', () => {
     loadMembers();
     
-    // Search functionality
     document.getElementById('searchInput').addEventListener('input', (e) => {
         filterMembers(e.target.value);
     });
 });
 
-// Load members from backend
 async function loadMembers() {
     const token = localStorage.getItem('token');
     
@@ -32,9 +29,7 @@ async function loadMembers() {
             return;
         }
 
-        if (!response.ok) {
-            throw new Error('Failed to load members');
-        }
+        if (!response.ok) throw new Error('Failed to load members');
 
         allMembers = await response.json();
         displayMembers(allMembers);
@@ -49,7 +44,6 @@ async function loadMembers() {
     }
 }
 
-// Display members in table
 function displayMembers(members) {
     const container = document.getElementById('membersList');
     
@@ -62,7 +56,7 @@ function displayMembers(members) {
         return;
     }
 
-    const tableHtml = `
+    container.innerHTML = `
         <table>
             <thead>
                 <tr>
@@ -91,11 +85,8 @@ function displayMembers(members) {
             </tbody>
         </table>
     `;
-    
-    container.innerHTML = tableHtml;
 }
 
-// Filter members based on search input
 function filterMembers(searchTerm) {
     if (!searchTerm.trim()) {
         displayMembers(allMembers);
@@ -115,21 +106,17 @@ function filterMembers(searchTerm) {
     displayMembers(filtered);
 }
 
-// View member details
 async function viewMember(id) {
     currentMemberId = id;
     
     try {
         const response = await fetchWithAuth(`${API_BASE_URL}/members/${id}`);
         
-        if (!response.ok) {
-            throw new Error('Failed to load member details');
-        }
+        if (!response.ok) throw new Error('Failed to load member details');
         
         const member = await response.json();
         
-        const modalBody = document.getElementById('modalBody');
-        modalBody.innerHTML = `
+        document.getElementById('modalBody').innerHTML = `
             <div class="detail-row">
                 <div class="detail-label">Full Name:</div>
                 <div class="detail-value">${member.first_name} ${member.last_name}</div>
@@ -188,33 +175,28 @@ async function viewMember(id) {
     }
 }
 
-// Edit member (redirect to edit page)
 function editMember(id) {
     window.location.href = `edit-member.html?id=${id}`;
 }
 
-// Edit current member from modal
 function editCurrentMember() {
     if (currentMemberId) {
         window.location.href = `edit-member.html?id=${currentMemberId}`;
     }
 }
 
-// Confirm delete
 function confirmDelete(id, name) {
     if (confirm(`Are you sure you want to delete ${name}? This action cannot be undone.`)) {
         deleteMember(id);
     }
 }
 
-// Delete current member from modal
 function deleteCurrentMember() {
     if (currentMemberId) {
         confirmDelete(currentMemberId, 'this member');
     }
 }
 
-// Delete member
 async function deleteMember(id) {
     try {
         const response = await fetchWithAuth(`${API_BASE_URL}/members/delete/${id}`, {
@@ -224,7 +206,7 @@ async function deleteMember(id) {
         if (response.ok) {
             alert('Member deleted successfully');
             closeModal();
-            loadMembers(); // Refresh the list
+            loadMembers();
         } else {
             const error = await response.json();
             alert(error.message || 'Failed to delete member');
@@ -235,16 +217,19 @@ async function deleteMember(id) {
     }
 }
 
-// Close modal
 function closeModal() {
     document.getElementById('memberModal').style.display = 'none';
     currentMemberId = null;
 }
 
-// Close modal when clicking outside
 window.onclick = function(event) {
     const modal = document.getElementById('memberModal');
-    if (event.target === modal) {
-        closeModal();
-    }
+    if (event.target === modal) closeModal();
 }
+
+window.viewMember = viewMember;
+window.editMember = editMember;
+window.editCurrentMember = editCurrentMember;
+window.confirmDelete = confirmDelete;
+window.deleteCurrentMember = deleteCurrentMember;
+window.closeModal = closeModal;

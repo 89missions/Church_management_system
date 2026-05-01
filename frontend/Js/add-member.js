@@ -19,8 +19,6 @@ document.getElementById('addMemberForm')?.addEventListener('submit', async (e) =
         emergency_contact_phone: document.getElementById('emergencyPhone').value || null,
         positions: getSelectedPositions()
     };
-
-    console.log(memberData)
     
     // Validate required fields
     if (!memberData.first_name || !memberData.last_name || !memberData.phone) {

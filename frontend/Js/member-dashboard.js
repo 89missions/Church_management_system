@@ -252,6 +252,8 @@ function openPasswordModal() {
     document.getElementById('passwordAlert').innerHTML = '';
 }
 
+document.querySelector('.change-password-btn').addEventListener('click',openPasswordModal)
+
 function closePasswordModal() {
     document.getElementById('passwordModal').style.display = 'none';
 }
@@ -279,7 +281,8 @@ document.getElementById('passwordForm')?.addEventListener('submit', async (e) =>
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 current_password: currentPassword,
-                new_password: newPassword
+                new_password: newPassword,
+                confirm_password: confirmPassword
             })
         });
         

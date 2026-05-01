@@ -6,9 +6,11 @@
     <meta name="theme-color" content="#4F46E5">
     <meta name="description" content="Winners Chapel Church Management System - Manage members, attendance, offerings and more">
     <link rel="manifest" href="manifest.json">
-    <link rel="apple-touch-icon" href="https://images.unsplash.com/photo-1438032945730-e1b637b2fc1f?w=180&h=180&fit=crop">
+    <link rel="apple-touch-icon" href="assets/church-icon.png">
     <title>Winners Chapel | Church Management System</title>
     <link rel="stylesheet" href="css/style.css">
+    <!-- Font Awesome for icons (free) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 </head>
 <body>
     <!-- Navigation -->
@@ -22,13 +24,10 @@
                 <a href="signin.html" class="nav-btn signin-btn">Sign In</a>
             </div>
         </div>
-        
     </nav>
 
-    
-
-    <!-- Hero Section -->
-    <section class="hero">
+    <!-- Hero Section with Local Background Image -->
+    <section class="hero" style="background: linear-gradient(rgba(0,0,0,0.5), rgba(77, 75, 75, 0.5)), url('assets/herosection.jpg'); background-size: cover; background-position: center;">
         <div class="hero-overlay"></div>
         <div class="hero-content">
             <h1 class="hero-title">Winners Chapel</h1>
@@ -41,23 +40,23 @@
         </div>
     </section>
 
-    <!-- About Section -->
+    <!-- About Section with Local Background -->
     <section id="about" class="about-section">
         <div class="container">
             <h2 class="section-title">About Winners Chapel</h2>
             <div class="about-grid">
                 <div class="about-card">
-                    <div class="card-icon">🙏</div>
+                    <div class="card-icon"><i class="fas fa-praying-hands"></i></div>
                     <h3>Our Mission</h3>
                     <p>To win souls for Christ and nurture believers into spiritual maturity through sound doctrine and fellowship.</p>
                 </div>
                 <div class="about-card">
-                    <div class="card-icon">❤️</div>
+                    <div class="card-icon"><i class="fas fa-heart"></i></div>
                     <h3>Our Vision</h3>
                     <p>Raising victorious Christians who impact their world for the Kingdom of God.</p>
                 </div>
                 <div class="about-card">
-                    <div class="card-icon">👥</div>
+                    <div class="card-icon"><i class="fas fa-users"></i></div>
                     <h3>Our Community</h3>
                     <p>A loving family where every member is valued, equipped, and empowered to fulfill their purpose.</p>
                 </div>
@@ -65,21 +64,21 @@
         </div>
     </section>
 
-    <!-- Worship Image Section -->
+    <!-- Worship Image Section with Local assets -->
     <section class="worship-section">
         <div class="container">
             <h2 class="section-title">Worship With Us</h2>
             <div class="image-gallery">
                 <div class="gallery-item">
-                    <img src="https://images.unsplash.com/photo-1438032945730-e1b637b2fc1f?w=400&h=300&fit=crop" alt="Church worship service">
+                    <img src="assets/ronaldeingrandmomie.jpg" alt="Church worship service">
                     <div class="gallery-caption">Sunday Service</div>
                 </div>
                 <div class="gallery-item">
-                    <img src="https://images.unsplash.com/photo-1505238680356-667803448bb6?w=400&h=300&fit=crop" alt="People worshiping with hands raised">
+                    <img src="assets/praisesandworship.jpg" alt="People worshiping with hands raised">
                     <div class="gallery-caption">Praise & Worship</div>
                 </div>
                 <div class="gallery-item">
-                    <img src="https://images.unsplash.com/photo-1529078155058-5d716f45d604?w=400&h=300&fit=crop" alt="Church congregation">
+                    <img src="assets/another.jpg" alt="Church congregation">
                     <div class="gallery-caption">Fellowship</div>
                 </div>
             </div>
@@ -105,15 +104,6 @@
                     <div class="service-time">6:00 PM - Prayer Service</div>
                 </div>
             </div>
-        </div>
-    </section>
-
-    <!-- Call to Action -->
-    <section class="cta-section">
-        <div class="container">
-            <h2>Ready to Join Our Church Family?</h2>
-            <p>Sign up today and become part of Winners Chapel community.</p>
-            <a href="signup.html" class="btn btn-large">Get Started</a>
         </div>
     </section>
 
