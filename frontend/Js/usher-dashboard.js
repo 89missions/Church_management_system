@@ -197,6 +197,7 @@ async function markAttendance(memberId, firstName, lastName, phone) {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
+                member_name: firstName+lastName,
                 member_id: memberId,
                 service_date: today
             })

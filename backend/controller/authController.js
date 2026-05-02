@@ -71,9 +71,8 @@ const authController = async (req,res)=>{
 const changePassword = async (req, res) => {
     try {
         const { current_password, new_password, confirm_password } = req.body;
-        const userId = req.user.id; // From verifyJWT middleware
+        const userId = req.user.id;
 
-        // Validate all fields exist
         if (!current_password || !new_password || !confirm_password) {
             return res.status(400).json({ 
                 message: "Current password, new password, and confirmation are required" 

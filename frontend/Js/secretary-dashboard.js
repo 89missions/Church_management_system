@@ -62,34 +62,33 @@ async function loadSundaySummary() {
         showEmptySummary();
     }
 }
-
 // Display Sunday summary
 function displaySummary(summary) {
     const container = document.getElementById('summaryContent');
     container.innerHTML = `
         <div class="summary-content">
             <div class="summary-field">
-                <label>📖 Sermon Text</label>
+                <label><i class="fas fa-bible"></i> Sermon Text</label>
                 <p>${summary.sermon_text || 'Not recorded'}</p>
             </div>
             <div class="summary-field">
-                <label>🎯 Sermon Title</label>
+                <label><i class="fas fa-bullseye"></i> Sermon Title</label>
                 <p>${summary.sermon_title || 'Not recorded'}</p>
             </div>
             <div class="summary-field">
-                <label>📚 Teaching Text</label>
+                <label><i class="fas fa-book"></i> Teaching Text</label>
                 <p>${summary.teaching_text || 'Not recorded'}</p>
             </div>
             <div class="summary-field">
-                <label>💰 Offering Total</label>
+                <label><i class="fas fa-hand-holding-usd"></i> Offering Total</label>
                 <p>${formatCurrency(summary.offering_total || 0)}</p>
             </div>
             <div class="summary-field">
-                <label>👥 Attendance</label>
+                <label><i class="fas fa-users"></i> Attendance</label>
                 <p>${summary.attendance_count || 0} people</p>
             </div>
             <div class="summary-field">
-                <label>📝 Highlights</label>
+                <label><i class="fas fa-pen-alt"></i> Highlights</label>
                 <p>${summary.highlights || 'No notes recorded'}</p>
             </div>
         </div>

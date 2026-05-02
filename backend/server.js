@@ -3,9 +3,12 @@ const express = require('express');
 const cors = require('cors')
 const verifyJWT = require('./middlewares/verifyjwt.js')
 const cron = require('node-cron');
+const helmet = require('helmet')
 const { sendNotificationToAll } = require('./utils/notification');
 const PORT = 3000;
 const app = express();
+
+app.use(helmet())
 app.use(cors({
     origin: '*'
 }))

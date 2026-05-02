@@ -3,7 +3,7 @@ const pool = require('../config/dbConfig');
 // Mark single member as present for today
 const markAttendance = async (req, res) => {
     try {
-        const { member_id, service_date } = req.body;
+        const { member_id, service_date , member_name} = req.body;
         
         if (!member_id) {
             return res.status(400).json({ message: "Member ID is required" });
@@ -19,14 +19,14 @@ const markAttendance = async (req, res) => {
         
         // Insert or update attendance
         const query = `
-            INSERT INTO attendance (member_id, service_date, attended)
-            VALUES ($1, $2, true)
+            INSERT INTO attendance (member_id, member_name, service_date, attended)
+            VALUES ($1, $2, $3, true)
             ON CONFLICT (member_id, service_date) 
             DO UPDATE SET attended = true, updated_at = CURRENT_TIMESTAMP
             RETURNING id
         `;
         
-        await pool.query(query, [member_id, today]);
+        await pool.query(query, [member_id, member_name, today]);
         
         return res.status(200).json({ 
             success: true, 

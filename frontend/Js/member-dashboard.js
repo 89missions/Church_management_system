@@ -112,7 +112,7 @@ async function loadMyOfferings() {
     if (!memberId) return;
     
     try {
-        const response = await fetchWithAuth(`${API_BASE_URL}/offerings/member/${memberId}`);
+        const response = await fetchWithAuth(`${API_BASE_URL}/offerings/${memberId}`);
         
         if (response.ok) {
             const offerings = await response.json();

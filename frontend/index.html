@@ -17,7 +17,7 @@
     <nav class="navbar">
         <div class="nav-container">
             <div class="logo">
-                <span class="logo-icon">⛪</span>
+                <i class="fas fa-church logo-icon"></i>
                 <span class="logo-text">Winners Chapel</span>
             </div>
             <div class="nav-buttons">
@@ -27,7 +27,7 @@
     </nav>
 
     <!-- Hero Section with Local Background Image -->
-    <section class="hero" style="background: linear-gradient(rgba(0,0,0,0.5), rgba(77, 75, 75, 0.5)), url('assets/herosection.jpg'); background-size: cover; background-position: center;">
+    <section class="hero" style="background: linear-gradient(rgba(0,0,0,0.5), rgba(77, 75, 75, 0.5)), url('assets/forhero.jpg'); background-size: cover; background-position: center;">
         <div class="hero-overlay"></div>
         <div class="hero-content">
             <h1 class="hero-title">Winners Chapel</h1>
@@ -85,36 +85,60 @@
         </div>
     </section>
 
-    <!-- Service Times Section -->
-    <section class="services-section">
-        <div class="container">
-            <h2 class="section-title">Service Times</h2>
-            <div class="services-grid">
-                <div class="service-card">
-                    <div class="service-day">Sunday</div>
-                    <div class="service-time">9:00 AM - Worship Service</div>
-                    <div class="service-time">11:00 AM - Second Service</div>
+   <!-- Service Times Section with Image Cards -->
+<section class="services-section">
+    <div class="container">
+        <h2 class="section-title">Service Times</h2>
+        <div class="services-grid">
+            <div class="service-card" style="background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('assets/sunday-service.jpg');">
+                <div class="service-icon"><i class="fas fa-sun"></i></div>
+                <div class="service-day">Sunday</div>
+                <div class="service-time">
+                    <i class="fas fa-clock"></i> 9:00 AM - Worship Service
                 </div>
-                <div class="service-card">
-                    <div class="service-day">Wednesday</div>
-                    <div class="service-time">6:00 PM - Bible Study</div>
+                <div class="service-time">
+                    <i class="fas fa-clock"></i> 11:00 AM - Second Service
                 </div>
-                <div class="service-card">
-                    <div class="service-day">Friday</div>
-                    <div class="service-time">6:00 PM - Prayer Service</div>
+                <div class="service-location">
+                    <i class="fas fa-map-marker-alt"></i>Church Auditorium
+                </div>
+            </div>
+            <div class="service-card" style="background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('assets/wednesdayservice.jpg');">
+                <div class="service-icon"><i class="fas fa-book-open"></i></div>
+                <div class="service-day">Wednesday</div>
+                <div class="service-time">
+                    <i class="fas fa-clock"></i> 6:00 PM - Bible Study
+                </div>
+                <div class="service-location">
+                    <i class="fas fa-map-marker-alt"></i> Church Auditorium
+                </div>
+            </div>
+            <div class="service-card" style="background-image: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('assets/fridayservice.jpg');">
+                <div class="service-icon"><i class="fas fa-hands-praying"></i></div>
+                <div class="service-day">Friday</div>
+                <div class="service-time">
+                    <i class="fas fa-clock"></i> 6:00 PM - Prayer Service
+                </div>
+                <div class="service-location">
+                    <i class="fas fa-map-marker-alt"></i> Church Auditorium
                 </div>
             </div>
         </div>
-    </section>
+    </div>
+</section>
 
     <!-- Footer -->
     <footer class="footer">
         <div class="container">
-            <p>&copy; 2024 Winners Chapel. All rights reserved.</p>
+            <p>&copy; <span id="currentYear"></span> Winners Chapel. All rights reserved.</p>
             <p>Church Management System</p>
         </div>
     </footer>
 
     <script type="module" src="./js/auth.js"></script>
+    <script>
+        // Auto-update copyright year
+        document.getElementById('currentYear').textContent = new Date().getFullYear();
+    </script>
 </body>
 </html>

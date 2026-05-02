@@ -104,7 +104,6 @@ body {
     align-items: center;
     justify-content: center;
     text-align: center;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     margin-top: 60px;
 }
 
@@ -277,28 +276,46 @@ section {
     text-align: center;
 }
 
-/* Services Grid */
+/* Services Grid - Updated Image Card Style */
+.services-section {
+    background: var(--light);
+}
+
 .services-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
     gap: 2rem;
 }
 
 .service-card {
-    background: linear-gradient(135deg, var(--primary), var(--primary-dark));
-    color: white;
+    background-size: cover;
+    background-position: center;
+    border-radius: 20px;
     padding: 2rem;
-    border-radius: 15px;
+    color: white;
     text-align: center;
-    transition: transform 0.3s;
+    transition: all 0.3s ease;
+    position: relative;
+    min-height: 320px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    box-shadow: var(--shadow);
 }
 
 .service-card:hover {
-    transform: translateY(-5px);
+    transform: translateY(-10px);
+    box-shadow: var(--shadow-lg);
+}
+
+.service-icon {
+    font-size: 2.5rem;
+    margin-bottom: 1rem;
+    color: white;
 }
 
 .service-day {
-    font-size: 1.5rem;
+    font-size: 1.8rem;
     font-weight: bold;
     margin-bottom: 1rem;
 }
@@ -306,6 +323,26 @@ section {
 .service-time {
     margin: 0.5rem 0;
     font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.service-time i {
+    font-size: 0.9rem;
+    opacity: 0.8;
+}
+
+.service-location {
+    margin-top: 1rem;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding-top: 0.5rem;
+    border-top: 1px solid rgba(255,255,255,0.3);
 }
 
 /* CTA Section */
@@ -386,6 +423,27 @@ section {
     
     .btn {
         text-align: center;
+    }
+    
+    /* Service cards mobile */
+    .services-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .service-card {
+        min-height: 280px;
+        padding: 1.5rem;
+    }
+    
+    .service-day {
+        font-size: 1.5rem;
+    }
+}
+
+/* Tablet Responsive */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .services-grid {
+        grid-template-columns: repeat(2, 1fr);
     }
 }
 

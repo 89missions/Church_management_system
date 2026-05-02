@@ -48,7 +48,9 @@ function populateForm(member) {
     document.getElementById('lastName').value = member.last_name || '';
     document.getElementById('email').value = member.email || '';
     document.getElementById('phone').value = member.phone || '';
-    document.getElementById('dob').value = member.date_of_birth || '';
+    document.getElementById('dob').value = member.date_of_birth 
+    ? member.date_of_birth.split('T')[0] 
+    : '';
     document.getElementById('gender').value = member.gender || '';
     document.getElementById('address').value = member.address || '';
     document.getElementById('maritalStatus').value = member.marital_status || '';

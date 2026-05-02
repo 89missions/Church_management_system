@@ -7,6 +7,7 @@
     <title>Manage Members | Winners Chapel CMS</title>
     <link rel="manifest" href="./manifest.json">
     <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
     <style>
         .members-container {
             max-width: 1400px;
@@ -94,6 +95,9 @@
             border-radius: 5px;
             cursor: pointer;
             font-size: 0.8rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
         }
 
         .edit-btn {
@@ -104,6 +108,47 @@
         .delete-btn {
             background: #ef4444;
             color: white;
+        }
+
+        /* Pagination */
+        .pagination {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            padding: 1.2rem;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        .pagination button {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.5rem 1.2rem;
+            border: none;
+            border-radius: 8px;
+            background: var(--primary);
+            color: white;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background 0.2s;
+        }
+
+        .pagination button:hover:not(:disabled) {
+            background: var(--primary-dark, #4338ca);
+        }
+
+        .pagination button:disabled {
+            background: #e5e7eb;
+            color: #9ca3af;
+            cursor: not-allowed;
+        }
+
+        .pagination span {
+            font-size: 0.9rem;
+            color: var(--gray);
+            min-width: 100px;
+            text-align: center;
         }
 
         .modal {
@@ -184,7 +229,7 @@
 <body>
     <div class="members-container">
         <div class="header-bar">
-            <h1>📋 Manage Members</h1>
+            <h1><i class="fa-solid fa-users"></i> Manage Members</h1>
             <div class="search-bar">
                 <input type="text" id="searchInput" placeholder="Search by name, email, or phone...">
             </div>
@@ -206,8 +251,12 @@
             </div>
             <div id="modalBody"></div>
             <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
-                <button onclick="editCurrentMember()" class="edit-btn" style="padding: 0.5rem 1rem;">✏️ Edit</button>
-                <button onclick="deleteCurrentMember()" class="delete-btn" style="padding: 0.5rem 1rem;">🗑️ Delete</button>
+                <button onclick="editCurrentMember()" class="edit-btn" style="padding: 0.5rem 1rem;">
+                    <i class="fa-solid fa-pen-to-square"></i> Edit
+                </button>
+                <button onclick="deleteCurrentMember()" class="delete-btn" style="padding: 0.5rem 1rem;">
+                    <i class="fa-solid fa-trash"></i> Delete
+                </button>
             </div>
         </div>
     </div>

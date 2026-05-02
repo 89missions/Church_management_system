@@ -11,17 +11,20 @@ document.addEventListener('DOMContentLoaded', () => {
         filterMembers(e.target.value);
     });
 });
+const MEMBERS_PER_PAGE = 15;
+let currentPage = 1;
+let totalPages = 1;
 
-async function loadMembers() {
+async function loadMembers(page = 1) {
     const token = localStorage.getItem('token');
-    
+
     if (!token) {
         window.location.href = 'signin.html';
         return;
     }
 
     try {
-        const response = await fetchWithAuth(`${API_BASE_URL}/members/`);
+        const response = await fetchWithAuth(`${API_BASE_URL}/members/?page=${page}&limit=${MEMBERS_PER_PAGE}`);
 
         if (response.status === 401) {
             localStorage.clear();
@@ -31,7 +34,11 @@ async function loadMembers() {
 
         if (!response.ok) throw new Error('Failed to load members');
 
-        allMembers = await response.json();
+        const data = await response.json();
+        allMembers = data.members;
+        currentPage = data.pagination.currentPage;
+        totalPages = data.pagination.totalPages;
+
         displayMembers(allMembers);
 
     } catch (error) {
@@ -46,7 +53,7 @@ async function loadMembers() {
 
 function displayMembers(members) {
     const container = document.getElementById('membersList');
-    
+
     if (!members || members.length === 0) {
         container.innerHTML = `
             <div class="empty-state">
@@ -84,9 +91,20 @@ function displayMembers(members) {
                 `).join('')}
             </tbody>
         </table>
+        <div class="pagination">
+            <button onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>← Prev</button>
+            <span>Page ${currentPage} of ${totalPages}</span>
+            <button onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>Next →</button>
+        </div>
     `;
 }
 
+function changePage(page) {
+    if (page < 1 || page > totalPages) return;
+    loadMembers(page);
+}
+
+window.changePage = changePage;
 function filterMembers(searchTerm) {
     if (!searchTerm.trim()) {
         displayMembers(allMembers);

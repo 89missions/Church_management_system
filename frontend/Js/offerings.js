@@ -38,7 +38,8 @@ async function loadMembers() {
         const response = await fetchWithAuth(`${API_BASE_URL}/members/`);
         
         if (response.ok) {
-            allMembers = await response.json();
+            const data = await response.json();
+            allMembers = data.members || data;
         }
     } catch (error) {
         console.error('Error loading members:', error);
@@ -176,22 +177,15 @@ async function recordOffering() {
     const referenceNumber = document.getElementById('referenceNumber').value;
     const offeringDate = document.getElementById('offeringDate').value;
     const notes = document.getElementById('notes').value;
-    
-    if (!memberId) {
-        showAlert('Please select a member', 'error');
-        return;
-    }
-    
-    if (!amount || amount <= 0) {
-        showAlert('Please enter a valid amount', 'error');
-        return;
-    }
-    
+
+    if (!memberId) { showAlert('Please select a member', 'error'); return; }
+    if (!amount || amount <= 0) { showAlert('Please enter a valid amount', 'error'); return; }
+
     const submitBtn = document.querySelector('.submit-btn');
     const originalText = submitBtn.textContent;
     submitBtn.textContent = 'Recording...';
     submitBtn.disabled = true;
-    
+
     try {
         const response = await fetchWithAuth(`${API_BASE_URL}/offerings`, {
             method: 'POST',
@@ -206,10 +200,13 @@ async function recordOffering() {
                 notes: notes || null
             })
         });
-        
+
+        // Reset button immediately after response
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
+
         if (response.ok) {
             showAlert('Offering recorded successfully!', 'success');
-            
             clearSelectedMember();
             document.getElementById('offeringType').value = 'Tithe';
             document.getElementById('amount').value = '';
@@ -217,7 +214,6 @@ async function recordOffering() {
             document.getElementById('referenceNumber').value = '';
             document.getElementById('notes').value = '';
             document.getElementById('offeringDate').value = new Date().toISOString().split('T')[0];
-            
             await loadOfferings();
         } else {
             const error = await response.json();
@@ -225,13 +221,11 @@ async function recordOffering() {
         }
     } catch (error) {
         console.error('Error:', error);
-        showAlert('Failed to record offering', 'error');
-    } finally {
         submitBtn.textContent = originalText;
         submitBtn.disabled = false;
+        showAlert('Failed to record offering', 'error');
     }
 }
-
 function displayOfferings(offeringsList) {
     const container = document.getElementById('offeringsList');
     
@@ -304,3 +298,9 @@ function showAlert(message, type) {
 function scrollToForm() {
     document.getElementById('offeringForm').scrollIntoView({ behavior: 'smooth' });
 }
+
+window.recordOffering = recordOffering;
+window.selectMember = selectMember;
+window.clearSelectedMember = clearSelectedMember;
+window.scrollToForm = scrollToForm;
+window.clearDateFilter = clearDateFilter;

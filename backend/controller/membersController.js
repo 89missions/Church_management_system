@@ -3,16 +3,36 @@ const pool = require('../config/dbConfig')
 const bcrypt = require('bcryptjs')
 
 //getmembers
-const getMembers = async (req,res)=>{
+const getMembers = async (req, res) => {
     try {
-         //quering the db..
-        const allmembers = await pool.query('SELECT id, first_name, last_name, email, phone, address FROM members')
-        res.status(200).json(allmembers.rows)
+        const page = parseInt(req.query.page) || 1;
+        const limit = parseInt(req.query.limit) || 15;
+        const offset = (page - 1) * limit;
+
+        const countResult = await pool.query('SELECT COUNT(*) FROM members');
+        const totalMembers = parseInt(countResult.rows[0].count);
+        const totalPages = Math.ceil(totalMembers / limit);
+
+        const result = await pool.query(
+            'SELECT id, first_name, last_name, email, phone, address FROM members ORDER BY first_name ASC LIMIT $1 OFFSET $2',
+            [limit, offset]
+        );
+
+        res.status(200).json({
+            members: result.rows,
+            pagination: {
+                currentPage: page,
+                totalPages,
+                totalMembers,
+                limit
+            }
+        });
+
     } catch (error) {
-        console.error(error)
-        res.status(500).json({"message":"Internal server error"})
+        console.error(error);
+        res.status(500).json({ message: "Internal server error" });
     }
-}
+};
 
 //get members with id
 const getMembersWithId= async (req,res)=>{

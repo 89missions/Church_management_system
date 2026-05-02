@@ -7,7 +7,7 @@ const addOffering = async (req, res) => {
             offering_type, 
             amount, 
             payment_method, 
-            referenceNumber, 
+            reference_number, 
             offering_date, 
             notes 
         } = req.body;
@@ -38,16 +38,17 @@ const addOffering = async (req, res) => {
         }
 
         const text = `INSERT INTO offertory
-            (member_name, offering_type, amount, payment_method, reference_number, offering_date, notes) 
-            VALUES ($1, $2, $3, $4, $5, $6, $7)`;
+            (member_name, offering_type, amount, payment_method, reference_number, offering_date,member_id, notes) 
+            VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`;
 
         const values = [
             member_name,
             offering_type,
             amount,
             payment_method,
-            referenceNumber || null,
+            reference_number || null,
             offering_date || new Date().toISOString().split('T')[0],
+            member_id,
             notes || null
         ];
 
@@ -147,11 +148,40 @@ payment_method FROM offertory ORDER BY offering_date DESC LIMIT 15;`)
             res.status(500).json({ message: "Internal server error" });
         }
     };
+
+    const getMemberOfferingwithId = async (req, res) => {
+        try {
+            const { id } = req.params;
+    
+            if (!id) {
+                return res.status(400).json({ message: "Member ID is required" });
+            }
+    
+            const result = await pool.query(
+                `SELECT offering_type, amount, payment_method, offering_date, notes 
+                 FROM offertory 
+                 WHERE member_id = $1 
+                 ORDER BY offering_date DESC`,
+                [id]
+            );
+    
+            if (result.rows.length === 0) {
+                return res.status(404).json({ message: "No offerings found for this member" });
+            }
+    
+            return res.status(200).json(result.rows);
+    
+        } catch (error) {
+            console.error(error);
+            return res.status(500).json({ message: "Internal server error" });
+        }
+    };
     
     module.exports = {
         addOffering,
         monthlyOfferings,
         getOfferings,
         todayOfferings,
-        getOfferingsByDateRange
+        getOfferingsByDateRange,
+        getMemberOfferingwithId
     };
