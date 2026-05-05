@@ -4,9 +4,12 @@ const cors = require('cors')
 const verifyJWT = require('./middlewares/verifyjwt.js')
 const cron = require('node-cron');
 const helmet = require('helmet')
+const password_hash = require('./controller/hashedPassword.js')
 const { sendNotificationToAll } = require('./utils/notification');
 const PORT = 3000;
 const app = express();
+
+// password_hash
 
 app.use(helmet())
 app.use(cors({
